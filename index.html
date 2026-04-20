@@ -14,12 +14,24 @@
         }
         .header {
             text-align: center;
-            padding: 20px 0 12px;
+            padding: 20px 16px 12px;
             background: white;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
         h1 { color: #c0392b; font-size: 28px; margin-bottom: 5px; font-weight: 600; }
-        .subtitle { color: #7f8c8d; font-size: 14px; }
+        .subtitle { color: #7f8c8d; font-size: 14px; margin-bottom: 10px; }
+        
+        /* 新增：焦教授学术领衔区域 */
+        .academic-lead {
+            background: #f0f7ff;
+            border-left: 3px solid #c0392b;
+            padding: 12px 16px;
+            margin: 5px 0 0;
+            border-radius: 0 8px 8px 0;
+            text-align: left;
+        }
+        .lead-name { color: #2c3e50; font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+        .lead-title { color: #5d6d7e; font-size: 12px; line-height: 1.5; }
         
         /* 聊天容器 - 完全撑满，无白边 */
         #sdk-container {
@@ -42,6 +54,8 @@
         @media (max-width: 768px) {
             h1 { font-size: 24px; }
             .subtitle { font-size: 12px; }
+            .lead-name { font-size: 14px; }
+            .lead-title { font-size: 11px; }
         }
     </style>
     <script src="https://lf-cdn.coze.cn/obj/unpkg/latest/coze/web-sdk/dist/js-umd/index.min.js"></script>
@@ -49,7 +63,13 @@
 <body>
     <div class="header">
         <h1>KDGUIDE 1.0</h1>
-        <div class="subtitle">基于《中国儿童川崎病诊疗循证指南(2023)》等六部国家级指南与专家共识</div>
+        <div class="subtitle">基于3部国家级指南与3部专家共识</div>
+        
+        <!-- 新增：焦教授学术领衔区域 -->
+        <div class="academic-lead">
+            <div class="lead-name">焦富勇教授 领衔</div>
+            <div class="lead-title">陕西省人民医院儿童病院原院长 · 陕西省川崎病诊疗中心创始人<br>《川崎病全科医师诊疗指南(实践版·2025)》等权威诊疗规范牵头制定专家</div>
+        </div>
     </div>
     
     <div id="sdk-container"></div>
@@ -63,7 +83,6 @@
             container: document.getElementById('sdk-container'),
             theme: 'light',
             style: 'width: 100%; height: 100%; border: none;',
-            // 关键配置：隐藏SDK自带的标题栏
             showHeader: false,
             unauthorizedDescription: '访问受限，请刷新页面或联系管理员',
             onIframeReady: () => {
