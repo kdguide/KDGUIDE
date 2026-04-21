@@ -3,78 +3,310 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KDGUIDE 1.0 - 川崎病智能决策系统</title>
+    <title>KDGUIDE 1.0 · 川崎病智能决策系统</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html { height: 100%; background: #f5f7fa; }
+        body, html { 
+            height: 100%; 
+            background: linear-gradient(145deg, #f0f3f7 0%, #e8edf2 100%);
+        }
         body {
-            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            display: flex;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .app-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            overflow: hidden;
+        }
+        
+        /* === 左侧栏 === */
+        .left-sidebar {
+            width: 300px;
+            flex-shrink: 0;
             display: flex;
             flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
         }
-        .header {
-            text-align: center;
-            padding: 20px 16px 12px;
-            background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        h1 { color: #c0392b; font-size: 28px; margin-bottom: 5px; font-weight: 600; }
-        .subtitle { color: #7f8c8d; font-size: 14px; margin-bottom: 10px; }
         
-        /* 新增：焦教授学术领衔区域 */
-        .academic-lead {
-            background: #f0f7ff;
-            border-left: 3px solid #c0392b;
-            padding: 12px 16px;
-            margin: 5px 0 0;
-            border-radius: 0 8px 8px 0;
-            text-align: left;
+        /* === 专家卡 === */
+        .expert-card {
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.6), 0 8px 32px rgba(0, 100, 180, 0.08);
         }
-        .lead-name { color: #2c3e50; font-size: 15px; font-weight: 600; margin-bottom: 4px; }
-        .lead-title { color: #5d6d7e; font-size: 12px; line-height: 1.5; }
+        .expert-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .expert-avatar {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .expert-name {
+            color: #0C1929;
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .expert-tag {
+            display: inline-block;
+            background: #c0392b;
+            color: white;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+        .expert-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .detail-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            color: #5A6E82;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .detail-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #c0392b;
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
         
-        /* 聊天容器 - 完全撑满，无白边 */
+        /* === 能力卡片 === */
+        .capability-card {
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 14px;
+            padding: 14px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.6), 0 4px 16px rgba(0, 100, 180, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .capability-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .capability-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+        .capability-title {
+            color: #0C1929;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .capability-desc {
+            color: #5A6E82;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        
+        /* === 右侧聊天区 === */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.6), 0 8px 32px rgba(0, 100, 180, 0.08);
+            overflow: hidden;
+        }
+        .chat-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            flex-shrink: 0;
+        }
+        .chat-header-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0077B6, #00B4D8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .chat-header-icon svg {
+            width: 16px;
+            height: 16px;
+            fill: white;
+        }
+        .chat-header-title {
+            color: #0C1929;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .chat-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+        }
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #27C93F;
+            box-shadow: 0 0 6px rgba(39, 201, 63, 0.4);
+        }
+        .status-text {
+            color: #5A6E82;
+            font-size: 12px;
+        }
         #sdk-container {
             flex: 1;
-            width: 100%;
-            margin: 0;
-            border-radius: 0;
-            overflow: hidden;
-            background: white;
+            min-height: 0;
+            background: rgba(255, 255, 255, 0.3);
         }
         
-        .footer {
-            text-align: center;
-            padding: 10px;
-            color: #95a5a6;
-            font-size: 12px;
-            background: transparent;
-        }
-        
+        /* === 移动端适配 === */
         @media (max-width: 768px) {
-            h1 { font-size: 24px; }
-            .subtitle { font-size: 12px; }
-            .lead-name { font-size: 14px; }
-            .lead-title { font-size: 11px; }
+            .app-container {
+                flex-direction: column;
+                padding: 10px;
+                gap: 10px;
+            }
+            .left-sidebar {
+                width: 100%;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .expert-card {
+                width: 100%;
+                padding: 14px;
+            }
+            .capability-card {
+                flex: 1;
+                min-width: 120px;
+                padding: 10px 12px;
+            }
+            .capability-desc {
+                display: none;
+            }
         }
     </style>
     <script src="https://lf-cdn.coze.cn/obj/unpkg/latest/coze/web-sdk/dist/js-umd/index.min.js"></script>
 </head>
 <body>
-    <div class="header">
-        <h1>KDGUIDE 1.0</h1>
-        <div class="subtitle">基于3部权威指南与3部专家共识</div>
+    <div class="app-container">
+        <!-- 左侧栏 -->
+        <div class="left-sidebar">
+            <!-- 专家卡 -->
+            <div class="expert-card">
+                <div class="expert-header">
+                    <div class="expert-avatar">焦</div>
+                    <div>
+                        <div class="expert-name">焦富勇 教授</div>
+                        <div class="expert-tag">领衔专家</div>
+                    </div>
+                </div>
+                <div class="expert-details">
+                    <div class="detail-item">
+                        <span class="detail-dot"></span>
+                        陕西省人民医院儿童病院原院长
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-dot"></span>
+                        陕西省川崎病诊疗中心创始人
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-dot"></span>
+                        《川崎病全科医师诊疗指南（实践版·2025）》等权威诊疗规范牵头制定专家
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 能力卡片1 -->
+            <div class="capability-card">
+                <div class="capability-icon" style="background: rgba(0, 180, 216, 0.1);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#0077B6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                </div>
+                <div class="capability-title">3部权威指南+3部专家共识</div>
+            </div>
+            
+            <!-- 能力卡片2 -->
+            <div class="capability-card">
+                <div class="capability-icon" style="background: rgba(0, 180, 216, 0.1);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#0077B6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div>
+                    <div class="capability-title">循证决策</div>
+                    <div class="capability-desc">每条建议可追溯来源</div>
+                </div>
+            </div>
+            
+            <!-- 能力卡片3 -->
+            <div class="capability-card">
+                <div class="capability-icon" style="background: rgba(0, 180, 216, 0.1);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#0077B6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                </div>
+                <div>
+                    <div class="capability-title">AI 驱动</div>
+                    <div class="capability-desc">基于扣子智能体平台</div>
+                </div>
+            </div>
+        </div>
         
-        <!-- 新增：焦教授学术领衔区域 -->
-        <div class="academic-lead">
-            <div class="lead-name">焦富勇教授 领衔</div>
-            <div class="lead-title">陕西省人民医院儿童病院原院长 · 陕西省川崎病诊疗中心创始人<br>《川崎病全科医师诊疗指南(实践版·2025)》等权威诊疗规范牵头制定专家</div>
+        <!-- 右侧聊天区 -->
+        <div class="chat-area">
+            <div class="chat-header">
+                <div class="chat-header-icon">
+                    <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <span class="chat-header-title">KDGUIDE 1.0</span>
+                <div class="chat-status">
+                    <span class="status-dot"></span>
+                    <span class="status-text">AI 助手在线</span>
+                </div>
+            </div>
+            <div id="sdk-container"></div>
         </div>
     </div>
-    
-    <div id="sdk-container"></div>
-    
-    <div class="footer">循证决策建议 · 请结合临床判断</div>
 
     <script>
         cozeWebSDK.init({
@@ -86,7 +318,7 @@
             showHeader: false,
             unauthorizedDescription: '访问受限，请刷新页面或联系管理员',
             onIframeReady: () => {
-                console.log('✅ KDGUIDE 1.0 已成功加载');
+                console.log('KDGUIDE 1.0 已加载');
             }
         });
     </script>
