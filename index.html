@@ -1,326 +1,388 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KDGUIDE 1.0 · 川崎病智能决策系统</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html { 
-            height: 100%; 
-            background: linear-gradient(145deg, #f0f3f7 0%, #e8edf2 100%);
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', sans-serif;
-            display: flex;
-            -webkit-font-smoothing: antialiased;
-        }
-        
-        .app-container {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            gap: 16px;
-            padding: 16px;
-            overflow: hidden;
-        }
-        
-        /* === 左侧栏 === */
-        .left-sidebar {
-            width: 300px;
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            overflow-y: auto;
-        }
-        
-        /* === 专家卡 === */
-        .expert-card {
-            background: rgba(255, 255, 255, 0.72);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 20px;
-            padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: inset 0 1px 1px rgba(255,255,255,0.6), 0 8px 32px rgba(0, 100, 180, 0.08);
-        }
-        .expert-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 14px;
-        }
-        .expert-avatar {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(135deg, #c0392b, #e74c3c);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 18px;
-            font-weight: 700;
-            flex-shrink: 0;
-        }
-        .expert-name {
-            color: #0C1929;
-            font-size: 16px;
-            font-weight: 700;
-        }
-        .expert-tag {
-            display: inline-block;
-            background: #c0392b;
-            color: white;
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-weight: 600;
-            margin-top: 2px;
-        }
-        .expert-details {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .detail-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            color: #5A6E82;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-        .detail-dot {
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: #c0392b;
-            margin-top: 6px;
-            flex-shrink: 0;
-        }
-        
-        /* === 能力卡片 === */
-        .capability-card {
-            background: rgba(255, 255, 255, 0.72);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 14px;
-            padding: 14px 16px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: inset 0 1px 1px rgba(255,255,255,0.6), 0 4px 16px rgba(0, 100, 180, 0.06);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .capability-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        .capability-icon svg {
-            width: 18px;
-            height: 18px;
-        }
-        .capability-title {
-            color: #0C1929;
-            font-size: 14px;
-            font-weight: 600;
-        }
-        .capability-desc {
-            color: #5A6E82;
-            font-size: 12px;
-            margin-top: 1px;
-        }
-        
-        /* === 右侧聊天区 === */
-        .chat-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-            background: rgba(255, 255, 255, 0.72);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: inset 0 1px 1px rgba(255,255,255,0.6), 0 8px 32px rgba(0, 100, 180, 0.08);
-            overflow: hidden;
-        }
-        .chat-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 20px;
-            background: rgba(255, 255, 255, 0.5);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-            flex-shrink: 0;
-        }
-        .chat-header-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #0077B6, #00B4D8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .chat-header-icon svg {
-            width: 16px;
-            height: 16px;
-            fill: white;
-        }
-        .chat-header-title {
-            color: #0C1929;
-            font-size: 14px;
-            font-weight: 600;
-        }
-        .chat-status {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-left: auto;
-        }
-        .status-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #27C93F;
-            box-shadow: 0 0 6px rgba(39, 201, 63, 0.4);
-        }
-        .status-text {
-            color: #5A6E82;
-            font-size: 12px;
-        }
-        #sdk-container {
-            flex: 1;
-            min-height: 0;
-            background: rgba(255, 255, 255, 0.3);
-        }
-        
-        /* === 移动端适配 === */
-        @media (max-width: 768px) {
-            .app-container {
-                flex-direction: column;
-                padding: 10px;
-                gap: 10px;
-            }
-            .left-sidebar {
-                width: 100%;
-                flex-direction: row;
-                flex-wrap: wrap;
-                gap: 8px;
-            }
-            .expert-card {
-                width: 100%;
-                padding: 14px;
-            }
-            .capability-card {
-                flex: 1;
-                min-width: 120px;
-                padding: 10px 12px;
-            }
-            .capability-desc {
-                display: none;
-            }
-        }
-    </style>
-    <script src="https://lf-cdn.coze.cn/obj/unpkg/latest/coze/web-sdk/dist/js-umd/index.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KCGUIDE 1.0 - 川崎病智能决策系统</title>
+<script src="https://lf-cdn.coze.cn/obj/unpkg/latest/coze/web-sdk/dist/js-umd/index.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;background:#f5f5f5;overflow:hidden}
+
+/* ===== 顶部标题栏 ===== */
+.header{height:52px;display:flex;align-items:center;background:#fff;border-bottom:1px solid #e8e8e8;flex-shrink:0;padding:0 20px;gap:16px}
+.header-logo{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.header-logo .k{width:30px;height:30px;background:#D4453A;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:700}
+.header-logo .t{font-size:17px;font-weight:600;color:#1a1a1a;letter-spacing:0.04em}
+.header-sub{font-size:12px;color:#999;margin-left:4px;padding-left:10px;border-left:1px solid #e0e0e0;white-space:nowrap}
+
+/* ===== 主体：左右分栏 ===== */
+.body{flex:1;display:flex;overflow:hidden}
+
+/* ===== 左侧：文献区 ===== */
+.guide-panel{
+  width:300px;
+  min-width:300px;
+  background:#fff;
+  border-right:1px solid #e8e8e8;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.guide-header{
+  padding:14px 16px 10px;
+  border-bottom:1px solid #f0f0f0;
+  flex-shrink:0;
+}
+.guide-header h2{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:4px}
+.guide-header p{font-size:12px;color:#999}
+.guide-count{display:inline-block;background:#FFF5F5;color:#D4453A;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500;margin-left:6px}
+
+.guide-list{flex:1;overflow-y:auto;padding:12px;overflow-x:hidden}
+.guide-list::-webkit-scrollbar{width:3px}
+.guide-list::-webkit-scrollbar-thumb{background:#ddd;border-radius:2px}
+
+/* 文献卡片 */
+.guide-card{
+  background:#fafafa;
+  border:1px solid #f0f0f0;
+  border-radius:10px;
+  padding:14px;
+  margin-bottom:10px;
+  cursor:pointer;
+  transition:all .25s ease;
+  position:relative;
+  overflow:hidden;
+}
+.guide-card::before{
+  content:'';
+  position:absolute;
+  left:0;top:0;width:3px;height:100%;
+  background:#D4453A;
+  opacity:0;
+  transition:opacity .25s;
+}
+.guide-card:hover{
+  background:#fff;
+  border-color:#D4453A;
+  box-shadow:0 2px 12px rgba(212,69,58,0.08);
+  transform:translateX(2px);
+}
+.guide-card:hover::before{opacity:1}
+.guide-card:active{transform:translateX(0)}
+
+.guide-type{
+  display:inline-block;
+  font-size:10px;
+  padding:2px 8px;
+  border-radius:6px;
+  margin-bottom:8px;
+  font-weight:500;
+}
+.guide-type.zhinan{background:#FFF5F5;color:#D4453A}
+.guide-type.gongshi{background:#E8F5E9;color:#2E7D32}
+
+.guide-title{
+  font-size:13px;
+  font-weight:600;
+  color:#1a1a1a;
+  line-height:1.6;
+  margin-bottom:6px;
+}
+.guide-meta{
+  font-size:11px;
+  color:#999;
+  line-height:1.5;
+}
+.guide-meta .author{color:#666}
+.guide-year{
+  display:inline-block;
+  background:#f0f0f0;
+  color:#888;
+  font-size:10px;
+  padding:1px 6px;
+  border-radius:4px;
+  margin-top:6px;
+}
+
+/* 展开详情 */
+.guide-detail{
+  max-height:0;
+  overflow:hidden;
+  transition:max-height .3s ease;
+  margin-top:0;
+}
+.guide-card.expanded .guide-detail{
+  max-height:200px;
+  margin-top:10px;
+}
+.guide-detail-inner{
+  font-size:11px;
+  color:#888;
+  line-height:1.7;
+  padding-top:8px;
+  border-top:1px dashed #e8e8e8;
+}
+.guide-detail-inner strong{color:#D4453A}
+
+/* 底部标签 */
+.guide-footer{
+  padding:10px 16px;
+  border-top:1px solid #f0f0f0;
+  font-size:11px;
+  color:#bbb;
+  text-align:center;
+  flex-shrink:0;
+}
+
+/* ===== 右侧：扣子区 ===== */
+.coze-panel{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  background:#f5f5f5;
+}
+.coze-top{
+  height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#fff;
+  border-bottom:1px solid #e8e8e8;
+  flex-shrink:0;
+}
+.coze-top-inner{display:flex;align-items:center;gap:6px}
+.coze-top-inner .dot{width:6px;height:6px;background:#4CAF50;border-radius:50%}
+.coze-top-inner span{font-size:13px;color:#666}
+
+.coze-area{
+  flex:1;
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  justify-content:center;
+  padding:0;
+}
+#coze-box{
+  width:100%;
+  height:100%;
+  max-width:720px;
+  border:none;
+  background:transparent;
+}
+
+.coze-footer{
+  text-align:center;
+  padding:8px;
+  background:#fff;
+  border-top:1px solid #e8e8e8;
+  flex-shrink:0;
+  font-size:11px;
+  color:#bbb;
+}
+
+/* ===== 加载 ===== */
+.loading{position:fixed;top:0;left:0;width:100%;height:100%;background:#f5f5f5;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;transition:opacity .3s}
+.loading.hide{opacity:0;pointer-events:none}
+.loading-k{width:48px;height:48px;background:#D4453A;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.loading-k span{color:#fff;font-size:24px;font-weight:700}
+.loading-text{font-size:13px;color:#999}
+
+/* 响应式 */
+@media(max-width:768px){
+  .guide-panel{display:none}
+}
+</style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- 左侧栏 -->
-        <div class="left-sidebar">
-            <!-- 专家卡 -->
-            <div class="expert-card">
-                <div class="expert-header">
-                    <div class="expert-avatar">焦</div>
-                    <div>
-                        <div class="expert-name">焦富勇 教授</div>
-                        <div class="expert-tag">领衔专家</div>
-                    </div>
-                </div>
-                <div class="expert-details">
-                    <div class="detail-item">
-                        <span class="detail-dot"></span>
-                        陕西省人民医院儿童病院原院长
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-dot"></span>
-                        陕西省川崎病诊疗中心创始人
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-dot"></span>
-                        《川崎病全科医师诊疗指南（实践版·2025）》等权威诊疗规范牵头制定专家
-                    </div>
-                </div>
+
+<!-- 加载 -->
+<div class="loading" id="loading">
+  <div class="loading-k"><span>K</span></div>
+  <div class="loading-text">正在连接智能决策引擎...</div>
+</div>
+
+<div style="display:flex;flex-direction:column;height:100vh">
+  <!-- 顶部标题栏 -->
+  <div class="header">
+    <div class="header-logo">
+      <div class="k">K</div>
+      <div class="t">KCGUIDE</div>
+    </div>
+    <div class="header-sub">川崎病智能决策系统</div>
+  </div>
+
+  <!-- 主体 -->
+  <div class="body">
+    <!-- 左侧：6部文献 -->
+    <div class="guide-panel">
+      <div class="guide-header">
+        <h2>循证知识库 <span class="guide-count">6部</span></h2>
+        <p>内置权威指南与专家共识</p>
+      </div>
+
+      <div class="guide-list">
+        <!-- 文献1 -->
+        <div class="guide-card" onclick="toggleCard(this)">
+          <span class="guide-type zhinan">指南</span>
+          <div class="guide-title">中国儿童川崎病诊疗循证指南</div>
+          <div class="guide-meta">
+            <span class="author">焦富勇等</span> · 中华医学会儿科学分会心血管学组
+          </div>
+          <span class="guide-year">2023年</span>
+          <div class="guide-detail">
+            <div class="guide-detail-inner">
+              <strong>核心内容：</strong>20条推荐意见，涵盖分类定义、诊断、急性期治疗、超声心动图应用、MAS处理。基于GRADE证据质量分级。<br>
+              <strong>关键推荐：</strong>IVIG 2g/kg（1A）、不完全KD需完善超声（1A）、ASA 30-50mg/kg/d（1A）
             </div>
-            
-            <!-- 能力卡片1 -->
-            <div class="capability-card">
-                <div class="capability-icon" style="background: rgba(0, 180, 216, 0.1);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#0077B6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                </div>
-                <div class="capability-title">3部权威指南+3部专家共识</div>
-            </div>
-            
-            <!-- 能力卡片2 -->
-            <div class="capability-card">
-                <div class="capability-icon" style="background: rgba(0, 180, 216, 0.1);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#0077B6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                </div>
-                <div>
-                    <div class="capability-title">循证决策</div>
-                    <div class="capability-desc">每条建议可追溯来源</div>
-                </div>
-            </div>
-            
-            <!-- 能力卡片3 -->
-            <div class="capability-card">
-                <div class="capability-icon" style="background: rgba(0, 180, 216, 0.1);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#0077B6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-                </div>
-                <div>
-                    <div class="capability-title">AI 驱动</div>
-                    <div class="capability-desc">基于扣子智能体平台</div>
-                </div>
-            </div>
+          </div>
         </div>
-        
-        <!-- 右侧聊天区 -->
-        <div class="chat-area">
-            <div class="chat-header">
-                <div class="chat-header-icon">
-                    <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                </div>
-                <span class="chat-header-title">KDGUIDE 1.0</span>
-                <div class="chat-status">
-                    <span class="status-dot"></span>
-                    <span class="status-text">AI 助手在线</span>
-                </div>
+
+        <!-- 文献2 -->
+        <div class="guide-card" onclick="toggleCard(this)">
+          <span class="guide-type zhinan">指南</span>
+          <div class="guide-title">中国儿童不完全川崎病诊疗指南</div>
+          <div class="guide-meta">
+            <span class="author">焦富勇等</span> · 多中心循证研究
+          </div>
+          <span class="guide-year">2024年</span>
+          <div class="guide-detail">
+            <div class="guide-detail-inner">
+              <strong>核心内容：</strong>13条推荐意见，专门针对不完全川崎病的诊断与治疗。提出评分系统辅助诊断。<br>
+              <strong>关键推荐：</strong>超声心动图为核心诊断工具、CAL评估标准、早期识别流程
             </div>
-            <div id="sdk-container"></div>
+          </div>
         </div>
+
+        <!-- 文献3 -->
+        <div class="guide-card" onclick="toggleCard(this)">
+          <span class="guide-type zhinan">指南</span>
+          <div class="guide-title">川崎病全科医师诊疗指南<br><small style="color:#999;font-size:11px">（实践版·2025）</small></div>
+          <div class="guide-meta">
+            <span class="author">焦富勇等</span> · 面向基层全科医生
+          </div>
+          <span class="guide-year">2025年</span>
+          <div class="guide-detail">
+            <div class="guide-detail-inner">
+              <strong>核心内容：</strong>面向基层医生的实用指南，涵盖早期识别、转诊指征、疾病管理全流程。<br>
+              <strong>特色：</strong>实践导向、简化诊断流程、明确转诊标准
+            </div>
+          </div>
+        </div>
+
+        <!-- 文献4 -->
+        <div class="guide-card" onclick="toggleCard(this)">
+          <span class="guide-type gongshi">共识</span>
+          <div class="guide-title">静脉输注免疫球蛋白在儿童川崎病中应用的专家共识</div>
+          <div class="guide-meta">
+            <span class="author">杜忠东等</span> · 中国当代儿科杂志
+          </div>
+          <span class="guide-year">2021年</span>
+          <div class="guide-detail">
+            <div class="guide-detail-inner">
+              <strong>核心内容：</strong>18条推荐意见（A级9条，B级9条），涵盖IVIG适应证、禁忌证、输注方案、不良反应处理。<br>
+              <strong>关键推荐：</strong>2g/kg单次输注（1A）、12-24h完成（1A）、联合ASA（1A）
+            </div>
+          </div>
+        </div>
+
+        <!-- 文献5 -->
+        <div class="guide-card" onclick="toggleCard(this)">
+          <span class="guide-type gongshi">共识</span>
+          <div class="guide-title">阿司匹林在川崎病治疗中的儿科专家共识</div>
+          <div class="guide-meta">
+            <span class="author">焦富勇等</span> · 中国当代儿科杂志
+          </div>
+          <span class="guide-year">2022年</span>
+          <div class="guide-detail">
+            <div class="guide-detail-inner">
+              <strong>核心内容：</strong>ASA剂量、用法、疗程、不良反应防治，CAA患儿抗血小板治疗，KDSS中ASA应用。<br>
+              <strong>关键推荐：</strong>急性期30-50mg/kg/d、热退后3-5mg/kg/d、疗程6-8周
+            </div>
+          </div>
+        </div>
+
+        <!-- 文献6 -->
+        <div class="guide-card" onclick="toggleCard(this)">
+          <span class="guide-type gongshi">共识</span>
+          <div class="guide-title">糖皮质激素在川崎病治疗中的儿科专家共识</div>
+          <div class="guide-meta">
+            <span class="author">焦富勇等</span> · 中国当代儿科杂志
+          </div>
+          <span class="guide-year">2022年</span>
+          <div class="guide-detail">
+            <div class="guide-detail-inner">
+              <strong>核心内容：</strong>GC一线及二线治疗适应证、剂量、用法。包含Kobayashi高危评分系统。<br>
+              <strong>关键推荐：</strong>不推荐单用GC常规一线、IVIG无反应型补救治疗、KDSS冲击疗法
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="guide-footer">
+        点击卡片展开详情
+      </div>
     </div>
 
-    <script>
-        cozeWebSDK.init({
-            projectId: '7629990347443208201',
-            refreshToken: () => Promise.resolve('sat_PaSx9bLnzPpy93WbayMl8YmYzOScfePJQmx2z7JplZeKv5FVzJwk47MqlknBPPQo'),
-            container: document.getElementById('sdk-container'),
-            theme: 'light',
-            style: 'width: 100%; height: 100%; border: none;',
-            showHeader: false,
-            unauthorizedDescription: '访问受限，请刷新页面或联系管理员',
-            onIframeReady: () => {
-                console.log('KDGUIDE 1.0 已加载');
-            }
-        });
-    </script>
+    <!-- 右侧：扣子 -->
+    <div class="coze-panel">
+      <div class="coze-top">
+        <div class="coze-top-inner">
+          <div class="dot"></div>
+          <span>扣子 AI 决策引擎已就绪</span>
+        </div>
+      </div>
+
+      <div class="coze-area">
+        <div id="coze-box"></div>
+      </div>
+
+      <div class="coze-footer">
+        循证决策建议 · 请结合临床判断
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// 加载
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    document.getElementById('loading').classList.add('hide');
+  }, 1500);
+});
+
+// 卡片展开/收起
+function toggleCard(card) {
+  var wasExpanded = card.classList.contains('expanded');
+  // 收起所有
+  document.querySelectorAll('.guide-card').forEach(function(c) {
+    c.classList.remove('expanded');
+  });
+  // 如果之前没展开，则展开当前
+  if (!wasExpanded) {
+    card.classList.add('expanded');
+  }
+}
+
+// Coze
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof cozeWebSDK === 'undefined') { console.error('Coze SDK not loaded'); return; }
+  try {
+    cozeWebSDK.init({
+      projectId: '7629990347443208201',
+      refreshToken: () => Promise.resolve('pat_PDa1AkF7y6Wp8mceddnIFdaOnrKY8g3Z8INIRppsgw7bSs6RblGEJIPwfnXqd9ya'),
+      container: document.getElementById('coze-box'),
+      theme: 'light',
+      style: 'width: 100%; height: 100%; border: none;',
+      onIframeReady: function() {
+        document.getElementById('loading').classList.add('hide');
+      }
+    });
+  } catch (e) { console.error('Coze init failed:', e); }
+});
+</script>
+
 </body>
 </html>
