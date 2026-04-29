@@ -8,365 +8,156 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;background:#f5f5f5;overflow:hidden}
-
-/* ===== 顶部标题栏 ===== */
 .header{height:52px;display:flex;align-items:center;background:#fff;border-bottom:1px solid #e8e8e8;flex-shrink:0;padding:0 20px;gap:16px}
 .header-logo{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.header-logo .k{width:30px;height:30px;background:#D4453A;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:700}
+.header-logo .k{width:30px;height:30px;background:#D4453A;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;letter-spacing:-1px}
 .header-logo .t{font-size:17px;font-weight:600;color:#1a1a1a;letter-spacing:0.04em}
 .header-sub{font-size:12px;color:#999;margin-left:4px;padding-left:10px;border-left:1px solid #e0e0e0;white-space:nowrap}
-
-/* ===== 主体：左右分栏 ===== */
 .body{flex:1;display:flex;overflow:hidden}
-
-/* ===== 左侧：文献区 ===== */
-.guide-panel{
-  width:300px;
-  min-width:300px;
-  background:#fff;
-  border-right:1px solid #e8e8e8;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-}
-.guide-header{
-  padding:14px 16px 10px;
-  border-bottom:1px solid #f0f0f0;
-  flex-shrink:0;
-}
+.guide-panel{width:300px;min-width:300px;background:#fff;border-right:1px solid #e8e8e8;display:flex;flex-direction:column;overflow:hidden}
+.guide-header{padding:14px 16px 10px;border-bottom:1px solid #f0f0f0;flex-shrink:0}
 .guide-header h2{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:4px}
 .guide-header p{font-size:12px;color:#999}
 .guide-count{display:inline-block;background:#FFF5F5;color:#D4453A;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500;margin-left:6px}
-
 .guide-list{flex:1;overflow-y:auto;padding:12px;overflow-x:hidden}
 .guide-list::-webkit-scrollbar{width:3px}
 .guide-list::-webkit-scrollbar-thumb{background:#ddd;border-radius:2px}
-
-/* 文献卡片 */
-.guide-card{
-  background:#fafafa;
-  border:1px solid #f0f0f0;
-  border-radius:10px;
-  padding:14px;
-  margin-bottom:10px;
-  cursor:pointer;
-  transition:all .25s ease;
-  position:relative;
-  overflow:hidden;
-}
-.guide-card::before{
-  content:'';
-  position:absolute;
-  left:0;top:0;width:3px;height:100%;
-  background:#D4453A;
-  opacity:0;
-  transition:opacity .25s;
-}
-.guide-card:hover{
-  background:#fff;
-  border-color:#D4453A;
-  box-shadow:0 2px 12px rgba(212,69,58,0.08);
-  transform:translateX(2px);
-}
+.guide-card{background:#fafafa;border:1px solid #f0f0f0;border-radius:10px;padding:14px;margin-bottom:10px;cursor:pointer;transition:all .25s ease;position:relative;overflow:hidden}
+.guide-card::before{content:'';position:absolute;left:0;top:0;width:3px;height:100%;background:#D4453A;opacity:0;transition:opacity .25s}
+.guide-card:hover{background:#fff;border-color:#D4453A;box-shadow:0 2px 12px rgba(212,69,58,0.08);transform:translateX(2px)}
 .guide-card:hover::before{opacity:1}
 .guide-card:active{transform:translateX(0)}
-
-.guide-type{
-  display:inline-block;
-  font-size:10px;
-  padding:2px 8px;
-  border-radius:6px;
-  margin-bottom:8px;
-  font-weight:500;
-}
+.guide-type{display:inline-block;font-size:10px;padding:2px 8px;border-radius:6px;margin-bottom:8px;font-weight:500}
 .guide-type.zhinan{background:#FFF5F5;color:#D4453A}
 .guide-type.gongshi{background:#E8F5E9;color:#2E7D32}
-
-.guide-title{
-  font-size:13px;
-  font-weight:600;
-  color:#1a1a1a;
-  line-height:1.6;
-  margin-bottom:6px;
-}
-.guide-meta{
-  font-size:11px;
-  color:#999;
-  line-height:1.5;
-}
+.guide-title{font-size:13px;font-weight:600;color:#1a1a1a;line-height:1.6;margin-bottom:6px}
+.guide-meta{font-size:11px;color:#999;line-height:1.5}
 .guide-meta .author{color:#666}
-.guide-year{
-  display:inline-block;
-  background:#f0f0f0;
-  color:#888;
-  font-size:10px;
-  padding:1px 6px;
-  border-radius:4px;
-  margin-top:6px;
-}
-
-/* 展开详情 */
-.guide-detail{
-  max-height:0;
-  overflow:hidden;
-  transition:max-height .3s ease;
-  margin-top:0;
-}
-.guide-card.expanded .guide-detail{
-  max-height:200px;
-  margin-top:10px;
-}
-.guide-detail-inner{
-  font-size:11px;
-  color:#888;
-  line-height:1.7;
-  padding-top:8px;
-  border-top:1px dashed #e8e8e8;
-}
+.guide-year{display:inline-block;background:#f0f0f0;color:#888;font-size:10px;padding:1px 6px;border-radius:4px;margin-top:6px}
+.guide-detail{max-height:0;overflow:hidden;transition:max-height .3s ease;margin-top:0}
+.guide-card.expanded .guide-detail{max-height:200px;margin-top:10px}
+.guide-detail-inner{font-size:11px;color:#888;line-height:1.7;padding-top:8px;border-top:1px dashed #e8e8e8}
 .guide-detail-inner strong{color:#D4453A}
-
-/* 底部标签 */
-.guide-footer{
-  padding:10px 16px;
-  border-top:1px solid #f0f0f0;
-  font-size:11px;
-  color:#bbb;
-  text-align:center;
-  flex-shrink:0;
-}
-
-/* ===== 右侧：扣子区 ===== */
-.coze-panel{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-  background:#f5f5f5;
-}
-.coze-top{
-  height:44px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#fff;
-  border-bottom:1px solid #e8e8e8;
-  flex-shrink:0;
-}
+.guide-footer{padding:10px 16px;border-top:1px solid #f0f0f0;font-size:11px;color:#bbb;text-align:center;flex-shrink:0}
+.coze-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#f5f5f5}
+.coze-top{height:44px;display:flex;align-items:center;justify-content:center;background:#fff;border-bottom:1px solid #e8e8e8;flex-shrink:0}
 .coze-top-inner{display:flex;align-items:center;gap:6px}
 .coze-top-inner .dot{width:6px;height:6px;background:#4CAF50;border-radius:50%}
 .coze-top-inner span{font-size:13px;color:#666}
-
-.coze-area{
-  flex:1;
-  position:relative;
-  overflow:hidden;
-  display:flex;
-  justify-content:center;
-  padding:0;
-}
-#coze-box{
-  width:100%;
-  height:100%;
-  max-width:720px;
-  border:none;
-  background:transparent;
-}
-
-.coze-footer{
-  text-align:center;
-  padding:8px;
-  background:#fff;
-  border-top:1px solid #e8e8e8;
-  flex-shrink:0;
-  font-size:11px;
-  color:#bbb;
-}
-
-/* ===== 加载 ===== */
+.coze-area{flex:1;position:relative;overflow:hidden;display:flex;justify-content:center;padding:0}
+#coze-box{width:100%;height:100%;max-width:720px;border:none;background:transparent}
+.coze-footer{text-align:center;padding:8px;background:#fff;border-top:1px solid #e8e8e8;flex-shrink:0;font-size:11px;color:#bbb;display:flex;align-items:center;justify-content:center;gap:12px}
+.coze-footer a{color:#bbb;text-decoration:none}
+.coze-footer a:hover{color:#D4453A}
+.coze-footer .sep{color:#ddd}
 .loading{position:fixed;top:0;left:0;width:100%;height:100%;background:#f5f5f5;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;transition:opacity .3s}
 .loading.hide{opacity:0;pointer-events:none}
 .loading-k{width:48px;height:48px;background:#D4453A;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
-.loading-k span{color:#fff;font-size:24px;font-weight:700}
+.loading-k span{color:#fff;font-size:16px;font-weight:700;letter-spacing:-1px}
 .loading-text{font-size:13px;color:#999}
-
-/* 响应式 */
-@media(max-width:768px){
-  .guide-panel{display:none}
-}
+@media(max-width:768px){.guide-panel{display:none}}
 </style>
 </head>
 <body>
-
-<!-- 加载 -->
 <div class="loading" id="loading">
-  <div class="loading-k"><span>K</span></div>
+  <div class="loading-k"><span>KD</span></div>
   <div class="loading-text">正在连接智能决策引擎...</div>
 </div>
-
 <div style="display:flex;flex-direction:column;height:100vh">
-  <!-- 顶部标题栏 -->
   <div class="header">
     <div class="header-logo">
-      <div class="k">K</div>
+      <div class="k">KD</div>
       <div class="t">KDGUIDE</div>
     </div>
     <div class="header-sub">川崎病智能决策系统</div>
   </div>
-
-  <!-- 主体 -->
   <div class="body">
-    <!-- 左侧：6部文献 -->
     <div class="guide-panel">
       <div class="guide-header">
         <h2>循证知识库 <span class="guide-count">6部</span></h2>
         <p>内置权威指南与专家共识</p>
       </div>
-
       <div class="guide-list">
-        <!-- 文献1 -->
         <div class="guide-card" onclick="toggleCard(this)">
           <span class="guide-type zhinan">指南</span>
           <div class="guide-title">中国儿童川崎病诊疗循证指南</div>
-          <div class="guide-meta">
-            <span class="author">焦富勇等</span> · 中国当代儿科杂志
-          </div>
+          <div class="guide-meta"><span class="author">焦富勇等</span> · 中国当代儿科杂志</div>
           <span class="guide-year">2023年</span>
-          <div class="guide-detail">
-            <div class="guide-detail-inner">
-              <strong>核心内容：</strong>20条推荐意见，涵盖分类定义、诊断、急性期治疗、超声心动图应用、MAS处理。基于GRADE证据质量分级。<br>
-              <strong>关键推荐：</strong>IVIG 2g/kg（1A）、不完全KD需完善超声（1A）、ASA 30-50mg/kg/d（1A）
-            </div>
-          </div>
+          <div class="guide-detail"><div class="guide-detail-inner"><strong>核心内容：</strong>20条推荐意见，涵盖分类定义、诊断、急性期治疗、超声心动图应用、MAS处理。基于GRADE证据质量分级。<br><strong>关键推荐：</strong>IVIG 2g/kg（1A）、不完全KD需完善超声（1A）、ASA 30-50mg/kg/d（1A）</div></div>
         </div>
-
-        <!-- 文献2 -->
         <div class="guide-card" onclick="toggleCard(this)">
           <span class="guide-type zhinan">指南</span>
           <div class="guide-title">中国儿童不完全川崎病诊疗指南</div>
-          <div class="guide-meta">
-            <span class="author">焦富勇等</span> · BMC Pediatrics杂志
-          </div>
+          <div class="guide-meta"><span class="author">焦富勇等</span> · 中国当代儿科杂志</div>
           <span class="guide-year">2024年</span>
-          <div class="guide-detail">
-            <div class="guide-detail-inner">
-              <strong>核心内容：</strong>13条推荐意见，专门针对不完全川崎病的诊断与治疗。提出评分系统辅助诊断。<br>
-              <strong>关键推荐：</strong>超声心动图为核心诊断工具、CAL评估标准、早期识别流程
-            </div>
-          </div>
+          <div class="guide-detail"><div class="guide-detail-inner"><strong>核心内容：</strong>13条推荐意见，专门针对不完全川崎病的诊断与治疗。提出评分系统辅助诊断。<br><strong>关键推荐：</strong>超声心动图为核心诊断工具、CAL评估标准、早期识别流程</div></div>
         </div>
-
-        <!-- 文献3 -->
         <div class="guide-card" onclick="toggleCard(this)">
           <span class="guide-type zhinan">指南</span>
           <div class="guide-title">川崎病全科医师诊疗指南<br><small style="color:#999;font-size:11px">（实践版·2025）</small></div>
-          <div class="guide-meta">
-            <span class="author">焦富勇等</span> · 临床荟萃杂志
-          </div>
+          <div class="guide-meta"><span class="author">焦富勇等</span> · 临床荟萃杂志</div>
           <span class="guide-year">2025年</span>
-          <div class="guide-detail">
-            <div class="guide-detail-inner">
-              <strong>核心内容：</strong>面向基层医生的实用指南，涵盖早期识别、转诊指征、疾病管理全流程。<br>
-              <strong>特色：</strong>实践导向、简化诊断流程、明确转诊标准
-            </div>
-          </div>
+          <div class="guide-detail"><div class="guide-detail-inner"><strong>核心内容：</strong>面向基层医生的实用指南，涵盖早期识别、转诊指征、疾病管理全流程。<br><strong>特色：</strong>实践导向、简化诊断流程、明确转诊标准</div></div>
         </div>
-
-        <!-- 文献4 -->
         <div class="guide-card" onclick="toggleCard(this)">
           <span class="guide-type gongshi">共识</span>
           <div class="guide-title">静脉输注免疫球蛋白在儿童川崎病中应用的专家共识</div>
-          <div class="guide-meta">
-            <span class="author">杜忠东等</span> · 中国当代儿科杂志
-          </div>
+          <div class="guide-meta"><span class="author">杜忠东等</span> · 中国当代儿科杂志</div>
           <span class="guide-year">2021年</span>
-          <div class="guide-detail">
-            <div class="guide-detail-inner">
-              <strong>核心内容：</strong>18条推荐意见（A级9条，B级9条），涵盖IVIG适应证、禁忌证、输注方案、不良反应处理。<br>
-              <strong>关键推荐：</strong>2g/kg单次输注（1A）、12-24h完成（1A）、联合ASA（1A）
-            </div>
-          </div>
+          <div class="guide-detail"><div class="guide-detail-inner"><strong>核心内容：</strong>18条推荐意见（A级9条，B级9条），涵盖IVIG适应证、禁忌证、输注方案、不良反应处理。<br><strong>关键推荐：</strong>2g/kg单次输注（1A）、12-24h完成（1A）、联合ASA（1A）</div></div>
         </div>
-
-        <!-- 文献5 -->
         <div class="guide-card" onclick="toggleCard(this)">
           <span class="guide-type gongshi">共识</span>
           <div class="guide-title">阿司匹林在川崎病治疗中的儿科专家共识</div>
-          <div class="guide-meta">
-            <span class="author">焦富勇等</span> · 中国当代儿科杂志
-          </div>
+          <div class="guide-meta"><span class="author">焦富勇等</span> · 中国当代儿科杂志</div>
           <span class="guide-year">2022年</span>
-          <div class="guide-detail">
-            <div class="guide-detail-inner">
-              <strong>核心内容：</strong>ASA剂量、用法、疗程、不良反应防治，CAA患儿抗血小板治疗，KDSS中ASA应用。<br>
-              <strong>关键推荐：</strong>急性期30-50mg/kg/d、热退后3-5mg/kg/d、疗程6-8周
-            </div>
-          </div>
+          <div class="guide-detail"><div class="guide-detail-inner"><strong>核心内容：</strong>ASA剂量、用法、疗程、不良反应防治，CAA患儿抗血小板治疗，KDSS中ASA应用。<br><strong>关键推荐：</strong>急性期30-50mg/kg/d、热退后3-5mg/kg/d、疗程6-8周</div></div>
         </div>
-
-        <!-- 文献6 -->
         <div class="guide-card" onclick="toggleCard(this)">
           <span class="guide-type gongshi">共识</span>
           <div class="guide-title">糖皮质激素在川崎病治疗中的儿科专家共识</div>
-          <div class="guide-meta">
-            <span class="author">焦富勇等</span> · 中国当代儿科杂志
-          </div>
+          <div class="guide-meta"><span class="author">焦富勇等</span> · 中国当代儿科杂志</div>
           <span class="guide-year">2022年</span>
-          <div class="guide-detail">
-            <div class="guide-detail-inner">
-              <strong>核心内容：</strong>GC一线及二线治疗适应证、剂量、用法。包含Kobayashi高危评分系统。<br>
-              <strong>关键推荐：</strong>不推荐单用GC常规一线、IVIG无反应型补救治疗、KDSS冲击疗法
-            </div>
-          </div>
+          <div class="guide-detail"><div class="guide-detail-inner"><strong>核心内容：</strong>GC一线及二线治疗适应证、剂量、用法。包含Kobayashi高危评分系统。<br><strong>关键推荐：</strong>不推荐单用GC常规一线、IVIG无反应型补救治疗、KDSS冲击疗法</div></div>
         </div>
       </div>
-
-      <div class="guide-footer">
-        点击卡片展开详情
-      </div>
+      <div class="guide-footer">点击卡片展开详情</div>
     </div>
-
-    <!-- 右侧：扣子 -->
     <div class="coze-panel">
       <div class="coze-top">
         <div class="coze-top-inner">
           <div class="dot"></div>
-          <span>Coze AI 决策引擎已就绪</span>
+          <span>扣子 AI 决策引擎已就绪</span>
         </div>
       </div>
-
       <div class="coze-area">
         <div id="coze-box"></div>
       </div>
-
       <div class="coze-footer">
-        循证决策建议 · 请结合临床判断
+        <span>循证决策建议 · 请结合临床判断</span>
+        <span class="sep">|</span>
+        <span>基于三部权威指南与专家共识</span>
+        <span class="sep">|</span>
+        <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">鄂ICP备2026021462号</a>
       </div>
     </div>
   </div>
 </div>
-
 <script>
-// 加载
 document.addEventListener('DOMContentLoaded', function() {
   setTimeout(function() {
     document.getElementById('loading').classList.add('hide');
   }, 1500);
 });
-
-// 卡片展开/收起
 function toggleCard(card) {
   var wasExpanded = card.classList.contains('expanded');
-  // 收起所有
   document.querySelectorAll('.guide-card').forEach(function(c) {
     c.classList.remove('expanded');
   });
-  // 如果之前没展开，则展开当前
   if (!wasExpanded) {
     card.classList.add('expanded');
   }
 }
-
-// Coze
 document.addEventListener('DOMContentLoaded', function() {
   if (typeof cozeWebSDK === 'undefined') { console.error('Coze SDK not loaded'); return; }
   try {
@@ -383,6 +174,5 @@ document.addEventListener('DOMContentLoaded', function() {
   } catch (e) { console.error('Coze init failed:', e); }
 });
 </script>
-
 </body>
 </html>
