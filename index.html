@@ -64,15 +64,6 @@ body{
   -webkit-text-size-adjust:100%;
 }
 
-/* ---------- 顶部常驻免责声明 ---------- */
-.disclaimer-bar{
-  flex-shrink:0;background:#FFF4E5;border-bottom:1px solid #F5D9A8;
-  padding:7px 16px;font-size:12px;line-height:1.55;color:#7A4A00;
-  display:flex;gap:8px;align-items:baseline;z-index:30;
-}
-.disclaimer-bar strong{color:#B35A00;white-space:nowrap;font-weight:700}
-.disclaimer-bar b{color:#B3352C}
-
 /* ---------- 顶栏 ---------- */
 .header{
   height:var(--header-h);flex-shrink:0;background:#fff;border-bottom:1px solid var(--line);
@@ -418,8 +409,6 @@ mark{background:#FFE58F;color:#7A4A00;border-radius:2px;padding:0 1px;font-weigh
 
   .header-sub{display:none}
   .header{padding:0 12px}
-  .disclaimer-bar{font-size:11px;padding:6px 12px;gap:6px}
-  .disclaimer-bar span{line-height:1.5}
 
   .chat-area{padding:14px 12px}
   .composer{padding:9px 12px calc(9px + env(safe-area-inset-bottom))}
@@ -461,12 +450,6 @@ mark{background:#FFE58F;color:#7A4A00;border-radius:2px;padding:0 1px;font-weigh
 </style>
 </head>
 <body>
-
-<!-- 全局医疗免责声明：常驻顶部，不可关闭 -->
-<div class="disclaimer-bar" role="note" aria-label="医疗免责声明">
-  <strong>⚠ 重要提示</strong>
-  <span>本站内容仅供科普与健康教育参考，<b>不能替代执业医师的诊断与治疗</b>。患儿情况请及时就医，由专业儿科医生面诊决策。</span>
-</div>
 
 <header class="header">
   <div class="header-logo" aria-label="KDGUIDE">
