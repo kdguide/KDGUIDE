@@ -2,177 +2,1990 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KDGUIDE 1.0 - 川崎病智能决策系统</title>
-<script src="https://lf-cdn.coze.cn/obj/unpkg/latest/coze/web-sdk/dist/js-umd/index.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>KDGUIDE 2.1 - 川崎病指南知识库与辅助问答</title>
+<!-- 单文件版：样式/脚本/知识库已全部内联，仅此一个文件即可运行（v2.1） -->
+<meta name="description" content="川崎病（Kawasaki Disease）临床指南与专家共识知识库，收录6 部权威指南/共识，提供基于指南的辅助诊断问答与症状自查。仅供科普参考，不能替代医生诊断。">
+<meta name="keywords" content="川崎病,Kawasaki,儿童川崎病,冠状动脉瘤,IVIG,阿司匹林,川崎病诊断">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="http://www.kdguide.cn/">
+<meta property="og:title" content="KDGUIDE 2.1 - 川崎病指南知识库">
+<meta property="og:description" content="收录6 部川崎病权威指南与专家共识，提供指南原文检索与辅助诊断问答。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="http://www.kdguide.cn/">
+<meta name="theme-color" content="#D4453A">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23D4453A'/%3E%3Ctext x='16' y='22' font-size='15' font-family='sans-serif' font-weight='bold' fill='white' text-anchor='middle'%3EKD%3C/text%3E%3C/svg%3E">
 <style>
+/* ==========================================================
+   KDGUIDE 2.0 — 川崎病指南知识库
+   设计要点：顶部常驻免责声明 / 移动端知识库抽屉 / 高对比可访问
+   ========================================================== */
+
+:root{
+  --brand:#D4453A;
+  --brand-dark:#B3352C;
+  --brand-light:#FFF5F5;
+  --brand-soft:#FFE8E6;
+  --ink:#1A1A1A;
+  --ink-2:#4A4A4A;
+  --muted:#8A8A8A;
+  --line:#E8E8E8;
+  --line-2:#F0F0F0;
+  --bg:#F5F5F5;
+  --card:#FFFFFF;
+  --ok:#2E9E4F;
+  --warn:#E8A317;
+  --err:#D4453A;
+  --radius:12px;
+  --shadow:0 2px 12px rgba(0,0,0,.06);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.14);
+  --header-h:50px;
+  --disc-h:auto;
+  --guide-w:326px;
+}
+
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;background:#f5f5f5;overflow:hidden}
-.header{height:52px;display:flex;align-items:center;background:#fff;border-bottom:1px solid #e8e8e8;flex-shrink:0;padding:0 20px;gap:16px}
+
+/* body 默认 margin 会让顶部常驻免责声明被推离视口上沿（实测 top=21px），
+   这里显式归零，确保免责条真正"贴顶常驻"。 */
+html,body{margin:0;padding:0}
+
+/* hidden 属性必须始终生效：
+   下方多处使用 display:flex 的组件（弹层、降级条等）会覆盖浏览器默认的
+   [hidden]{display:none}，导致"隐藏"失效。此处统一兜底。 */
+[hidden]{display:none !important}
+
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+  background:var(--bg);color:var(--ink);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- 顶部常驻免责声明 ---------- */
+.disclaimer-bar{
+  flex-shrink:0;background:#FFF4E5;border-bottom:1px solid #F5D9A8;
+  padding:7px 16px;font-size:12px;line-height:1.55;color:#7A4A00;
+  display:flex;gap:8px;align-items:baseline;z-index:30;
+}
+.disclaimer-bar strong{color:#B35A00;white-space:nowrap;font-weight:700}
+.disclaimer-bar b{color:#B3352C}
+
+/* ---------- 顶栏 ---------- */
+.header{
+  height:var(--header-h);flex-shrink:0;background:#fff;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;padding:0 16px;gap:12px;z-index:20;
+}
 .header-logo{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.header-logo .k{width:30px;height:30px;background:#D4453A;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;letter-spacing:-1px}
-.header-logo .t{font-size:17px;font-weight:600;color:#1a1a1a;letter-spacing:0.04em}
-.header-sub{font-size:12px;color:#999;margin-left:4px;padding-left:10px;border-left:1px solid #e0e0e0;white-space:nowrap}
-.body{flex:1;display:flex;overflow:hidden}
-.guide-panel{width:300px;min-width:300px;background:#fff;border-right:1px solid #e8e8e8;display:flex;flex-direction:column;overflow:hidden}
-.guide-header{padding:14px 16px 10px;border-bottom:1px solid #f0f0f0;flex-shrink:0}
-.guide-header h2{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:4px}
-.guide-header p{font-size:12px;color:#999}
-.guide-count{display:inline-block;background:#FFF5F5;color:#D4453A;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500;margin-left:6px}
-.guide-list{flex:1;overflow-y:auto;padding:12px;overflow-x:hidden}
-.guide-list::-webkit-scrollbar{width:3px}
-.guide-list::-webkit-scrollbar-thumb{background:#ddd;border-radius:2px}
-.guide-card{background:#fafafa;border:1px solid #f0f0f0;border-radius:10px;padding:14px;margin-bottom:10px;cursor:pointer;transition:all .25s ease;position:relative;overflow:hidden}
-.guide-card::before{content:'';position:absolute;left:0;top:0;width:3px;height:100%;background:#D4453A;opacity:0;transition:opacity .25s}
-.guide-card:hover{background:#fff;border-color:#D4453A;box-shadow:0 2px 12px rgba(212,69,58,0.08);transform:translateX(2px)}
-.guide-card:hover::before{opacity:1}
-.guide-card:active{transform:translateX(0)}
-.guide-type{display:inline-block;font-size:10px;padding:2px 8px;border-radius:6px;margin-bottom:8px;font-weight:500}
-.guide-type.zhinan{background:#FFF5F5;color:#D4453A}
+.header-logo .k{
+  width:28px;height:28px;background:var(--brand);border-radius:7px;display:flex;
+  align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;letter-spacing:-.5px;
+}
+.header-logo .t{font-size:16px;font-weight:600;letter-spacing:.03em}
+.header-sub{font-size:12px;color:var(--muted);padding-left:12px;border-left:1px solid #E0E0E0;white-space:nowrap}
+.header-actions{margin-left:auto;display:flex;gap:8px}
+.btn-guide{
+  display:none;border:1px solid var(--brand);background:#fff;color:var(--brand);
+  padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;
+}
+.btn-guide:active{background:var(--brand-light)}
+
+/* ---------- 主体布局 ---------- */
+.body{flex:1;display:flex;overflow:hidden;position:relative;min-height:0}
+
+/* ---------- 左：指南知识库 ---------- */
+.guide-panel{
+  width:var(--guide-w);min-width:var(--guide-w);background:#fff;
+  border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;
+}
+.guide-header{padding:14px 16px 10px;border-bottom:1px solid var(--line-2);flex-shrink:0}
+.guide-header h2{font-size:15px;font-weight:600;margin-bottom:3px}
+.guide-count{display:inline-block;background:var(--brand-light);color:var(--brand);font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500;margin-left:4px}
+.guide-header p{font-size:12px;color:var(--muted)}
+
+.search-wrap{position:relative;margin-top:10px}
+.search-input{
+  width:100%;padding:8px 30px 8px 11px;border:1px solid var(--line);border-radius:8px;
+  font-size:13px;font-family:inherit;background:#FAFAFA;color:var(--ink);
+}
+.search-input:focus{outline:none;border-color:var(--brand);background:#fff;box-shadow:0 0 0 3px rgba(212,69,58,.08)}
+.search-clear{
+  position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:transparent;
+  font-size:20px;line-height:1;color:var(--muted);cursor:pointer;padding:2px 6px;border-radius:50%;
+}
+.search-clear:hover{color:var(--brand)}
+.search-hint{font-size:11px;color:var(--muted);margin-top:7px}
+.search-hint b{color:var(--brand)}
+
+.guide-list{flex:1;overflow-y:auto;padding:12px;overflow-x:hidden;overscroll-behavior:contain}
+.guide-list::-webkit-scrollbar{width:4px}
+.guide-list::-webkit-scrollbar-thumb{background:#DDD;border-radius:2px}
+
+/* 指南卡片 */
+.guide-card{background:#FAFAFA;border:1px solid var(--line-2);border-radius:var(--radius);margin-bottom:9px;overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.guide-card:hover{border-color:var(--brand);box-shadow:var(--shadow)}
+.guide-card.open{background:#fff;border-color:var(--brand);box-shadow:var(--shadow)}
+.guide-card-hd{padding:12px 14px;cursor:pointer;display:flex;gap:10px;align-items:flex-start}
+.guide-card-hd:focus-visible{outline:2px solid var(--brand);outline-offset:-2px}
+.guide-type{flex-shrink:0;font-size:10px;padding:2px 7px;border-radius:5px;font-weight:500;margin-top:1px}
+.guide-type.zhinan{background:var(--brand-light);color:var(--brand)}
 .guide-type.gongshi{background:#E8F5E9;color:#2E7D32}
-.guide-title{font-size:13px;font-weight:600;color:#1a1a1a;line-height:1.6;margin-bottom:6px}
-.guide-meta{font-size:11px;color:#999;line-height:1.5}
-.guide-meta .author{color:#666}
-.guide-year{display:inline-block;background:#f0f0f0;color:#888;font-size:10px;padding:1px 6px;border-radius:4px;margin-top:6px}
-.guide-detail{max-height:0;overflow:hidden;transition:max-height .3s ease;margin-top:0}
-.guide-card.expanded .guide-detail{max-height:200px;margin-top:10px}
-.guide-detail-inner{font-size:11px;color:#888;line-height:1.7;padding-top:8px;border-top:1px dashed #e8e8e8}
-.guide-detail-inner strong{color:#D4453A}
-.guide-footer{padding:10px 16px;border-top:1px solid #f0f0f0;font-size:11px;color:#bbb;text-align:center;flex-shrink:0}
-.coze-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#f5f5f5}
-.coze-top{height:44px;display:flex;align-items:center;justify-content:center;background:#fff;border-bottom:1px solid #e8e8e8;flex-shrink:0}
-.coze-top-inner{display:flex;align-items:center;gap:6px}
-.coze-top-inner .dot{width:6px;height:6px;background:#4CAF50;border-radius:50%}
-.coze-top-inner span{font-size:13px;color:#666}
-.coze-area{flex:1;position:relative;overflow:hidden;display:flex;justify-content:center;padding:0}
-#coze-box{width:100%;height:100%;max-width:720px;border:none;background:transparent}
-.coze-footer{text-align:center;padding:8px;background:#fff;border-top:1px solid #e8e8e8;flex-shrink:0;font-size:11px;color:#bbb;display:flex;align-items:center;justify-content:center;gap:12px}
-.coze-footer a{color:#bbb;text-decoration:none}
-.coze-footer a:hover{color:#D4453A}
-.coze-footer .sep{color:#ddd}
-.loading{position:fixed;top:0;left:0;width:100%;height:100%;background:#f5f5f5;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;transition:opacity .3s}
-.loading.hide{opacity:0;pointer-events:none}
-.loading-k{width:48px;height:48px;background:#D4453A;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
-.loading-k span{color:#fff;font-size:16px;font-weight:700;letter-spacing:-1px}
-.loading-text{font-size:13px;color:#999}
-@media(max-width:768px){.guide-panel{display:none}}
+.guide-card-main{min-width:0;flex:1}
+.guide-title{font-size:13px;font-weight:600;line-height:1.55;color:var(--ink)}
+.guide-title small{color:var(--muted);font-size:11px;font-weight:400}
+.guide-meta{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5}
+.guide-year{display:inline-block;background:#EFEFEF;color:#888;font-size:10px;padding:1px 6px;border-radius:4px;margin-top:6px}
+.guide-arrow{flex-shrink:0;color:#CCC;font-size:11px;margin-top:3px;transition:transform .25s}
+.guide-card.open .guide-arrow{transform:rotate(90deg);color:var(--brand)}
+
+/* 展开区：指南正文条目 */
+.guide-body{display:none;padding:0 14px 14px;border-top:1px dashed var(--line);margin-top:2px}
+.guide-card.open .guide-body{display:block}
+.guide-summary{font-size:12px;color:var(--ink-2);line-height:1.75;margin:11px 0}
+.guide-summary strong{color:var(--brand)}
+.guide-hl{display:flex;flex-wrap:wrap;gap:5px;margin:9px 0 12px}
+.hl-tag{background:var(--brand-soft);color:var(--brand-dark);font-size:11px;padding:3px 8px;border-radius:5px;font-weight:500}
+
+/* 章节标题（如“静脉输注免疫球蛋白（IVIG）”） */
+.sec-title{
+  font-size:12px;font-weight:600;color:#fff;background:#5B6B7C;
+  padding:7px 11px;border-radius:7px;margin:12px 0 8px;
+}
+.sec-title:first-of-type{margin-top:4px}
+
+/* 条目（可被 AI 回答定位） */
+.kb-item{
+  border:1px solid var(--line-2);border-radius:9px;padding:11px 12px;margin-bottom:8px;
+  background:#fff;scroll-margin-top:16px;transition:border-color .3s,background .3s,box-shadow .3s;
+}
+.kb-item-h{font-size:13px;font-weight:600;color:var(--brand);margin-bottom:6px;display:flex;align-items:baseline;gap:6px}
+.kb-item-h .kb-anchor{font-size:10px;color:var(--muted);font-weight:400;font-family:ui-monospace,monospace}
+.kb-item p{font-size:12.5px;line-height:1.8;color:var(--ink-2)}
+.kb-points{list-style:none;margin-top:7px}
+.kb-points li{font-size:12px;line-height:1.75;color:var(--ink-2);padding-left:14px;position:relative;margin-bottom:3px}
+.kb-points li::before{content:'';position:absolute;left:3px;top:8px;width:4px;height:4px;border-radius:50%;background:var(--brand);opacity:.55}
+.kb-src{font-size:10.5px;color:var(--muted);margin-top:8px;padding-top:7px;border-top:1px dotted var(--line);display:flex;align-items:center;gap:5px;flex-wrap:wrap;line-height:1.6}
+.kb-src a{color:var(--brand);text-decoration:none}
+.kb-src a:hover{text-decoration:underline}
+
+/* 原文校正说明：标明该条目已按指南原文逐条核对 */
+.kb-editorial{
+  font-size:11px;line-height:1.65;color:#7A5A00;background:#FFF8E8;
+  border:1px solid #F0DFB0;border-radius:7px;padding:7px 9px;margin-top:8px;
+}
+.kb-ed-tag{
+  display:inline-block;background:#E8A317;color:#fff;font-size:10px;font-weight:600;
+  padding:1px 6px;border-radius:4px;margin-right:6px;vertical-align:1px;
+}
+
+/* 从 AI 回答跳转过来的高亮态 */
+.kb-item.target{
+  border-color:var(--brand);background:#FFFBFB;box-shadow:0 0 0 3px rgba(212,69,58,.13);
+  animation:targetPulse 1.5s ease;
+}
+@keyframes targetPulse{
+  0%{box-shadow:0 0 0 0 rgba(212,69,58,.42)}
+  60%{box-shadow:0 0 0 9px rgba(212,69,58,0)}
+  100%{box-shadow:0 0 0 3px rgba(212,69,58,.13)}
+}
+
+/* 搜索命中标记 */
+mark{background:#FFE58F;color:#7A4A00;border-radius:2px;padding:0 1px;font-weight:600}
+
+.guide-empty{text-align:center;padding:32px 16px;color:var(--muted);font-size:13px;line-height:1.8}
+.guide-footer{padding:9px 16px;border-top:1px solid var(--line-2);font-size:11px;color:#BBB;text-align:center;flex-shrink:0}
+
+/* ---------- 右：对话 ---------- */
+.chat-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;background:var(--bg)}
+.chat-top{
+  height:40px;flex-shrink:0;display:flex;align-items:center;padding:0 14px;background:#fff;
+  border-bottom:1px solid var(--line);gap:10px;
+}
+.chat-top-inner{display:flex;align-items:center;gap:7px;min-width:0}
+.chat-top-inner span{font-size:12.5px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background .3s}
+.dot.ok{background:var(--ok);box-shadow:0 0 0 3px rgba(46,158,79,.14)}
+/* 离线检索是正常降级状态，用中性灰而非红色，避免误导为"故障" */
+.dot.off{background:#9AA4AE;box-shadow:0 0 0 3px rgba(154,164,174,.16)}
+.dot.err{background:var(--err);box-shadow:0 0 0 3px rgba(212,69,58,.14)}
+.dot.load{background:var(--warn);animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.btn-again{
+  margin-left:auto;border:1px solid var(--brand);background:#fff;color:var(--brand);
+  padding:4px 12px;border-radius:7px;font-size:12px;cursor:pointer;font-family:inherit;flex-shrink:0;
+}
+.btn-again:hover{background:var(--brand-light)}
+
+/* 工具条（清空 / 重试） */
+.chat-tools{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.btn-tool{
+  border:1px solid var(--line);background:#fff;color:var(--muted);
+  padding:4px 11px;border-radius:7px;font-size:12px;cursor:pointer;font-family:inherit;
+  transition:all .2s;
+}
+.btn-tool:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-light)}
+
+/* 流式输出中的文本 */
+.stream-text:empty::after{content:'正在思考…';color:var(--muted)}
+.typing-text{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.5}
+
+/* 离线降级徽标 */
+.degraded-tag{
+  font-size:11px;color:#8A5A00;background:#FFF8E8;border:1px solid #F0DFB0;
+  border-radius:6px;padding:6px 9px;margin-bottom:9px;line-height:1.6;
+}
+
+/* 行内错误提示（超时/限流/鉴权等） */
+.inline-warn{
+  font-size:11.5px;color:#8B1F18;background:#FFF1F0;border:1px solid #F3C4C0;
+  border-left:3px solid var(--err);border-radius:6px;padding:7px 10px;margin-bottom:9px;line-height:1.6;
+}
+
+/* 输入超限/无效提示 */
+.composer-tip.warn{color:var(--err);font-weight:500}
+#char-count.warn{color:var(--warn);font-weight:600}
+
+/* 降级提示条 */
+.fallback-banner{
+  flex-shrink:0;display:flex;gap:11px;padding:11px 14px;background:#FFF8E8;
+  border-bottom:1px solid #F0DFB0;align-items:flex-start;
+}
+.fb-icon{
+  flex-shrink:0;width:19px;height:19px;border-radius:50%;background:var(--warn);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-top:1px;
+}
+.fb-body{min-width:0}
+.fb-body strong{font-size:12.5px;color:#8A5A00;display:block;margin-bottom:3px}
+.fb-body p{font-size:12px;color:#7A5A20;line-height:1.6}
+.fb-links{display:flex;gap:8px;margin-top:7px;flex-wrap:wrap}
+.fb-links a{
+  font-size:11.5px;color:var(--brand);text-decoration:none;border:1px solid #E8C8C5;
+  background:#fff;padding:4px 10px;border-radius:6px;
+}
+.fb-links a:hover{background:var(--brand-light)}
+
+.chat-area{flex:1;overflow-y:auto;padding:18px 16px;overscroll-behavior:contain;scroll-behavior:smooth}
+.chat-area::-webkit-scrollbar{width:5px}
+.chat-area::-webkit-scrollbar-thumb{background:#DDD;border-radius:3px}
+
+/* 欢迎区 */
+.welcome{max-width:660px;margin:0 auto;text-align:center;padding:14px 0 6px}
+.welcome-icon{
+  width:50px;height:50px;background:var(--brand);border-radius:13px;color:#fff;
+  display:flex;align-items:center;justify-content:center;margin:0 auto 13px;
+  font-size:16px;font-weight:700;letter-spacing:-.5px;
+}
+.welcome h2{font-size:18px;font-weight:600;margin-bottom:6px}
+.welcome-sub{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:18px}
+.suggest-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px;text-align:left}
+.suggest-btn{
+  background:#fff;border:1px solid var(--line);border-radius:9px;padding:10px 12px;
+  font-size:12.5px;color:var(--ink-2);cursor:pointer;font-family:inherit;line-height:1.5;
+  transition:all .2s;text-align:left;
+}
+.suggest-btn:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-light)}
+.welcome-note{
+  font-size:12px;color:#8A5A00;background:#FFF8E8;border:1px solid #F0DFB0;
+  border-radius:9px;padding:10px 13px;line-height:1.7;text-align:left;
+}
+.welcome-note strong{color:#B35A00}
+
+/* 消息气泡 */
+.msg{max-width:660px;margin:0 auto 14px;display:flex;gap:9px;animation:fadeUp .28s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.msg.user{flex-direction:row-reverse}
+.msg-avatar{
+  flex-shrink:0;width:27px;height:27px;border-radius:7px;display:flex;align-items:center;
+  justify-content:center;font-size:10px;font-weight:700;color:#fff;margin-top:1px;
+}
+.msg.ai .msg-avatar{background:var(--brand)}
+.msg.user .msg-avatar{background:#7B8794}
+.bubble{
+  padding:11px 14px;border-radius:12px;font-size:13.5px;line-height:1.8;
+  max-width:calc(100% - 36px);word-wrap:break-word;overflow-wrap:break-word;
+}
+.msg.ai .bubble{background:#fff;border:1px solid var(--line-2);border-top-left-radius:3px}
+.msg.user .bubble{background:var(--brand);color:#fff;border-top-right-radius:3px}
+.bubble p{margin-bottom:8px}
+.bubble p:last-child{margin-bottom:0}
+.bubble strong{font-weight:600;color:var(--brand-dark)}
+.msg.user .bubble strong{color:#fff}
+.bubble ul{margin:6px 0 8px;padding-left:17px}
+.bubble li{margin-bottom:4px}
+
+/* 回答内的引用出处 */
+.cites{margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);display:flex;flex-wrap:wrap;gap:6px}
+.cite-btn{
+  font-size:11px;color:var(--brand);background:var(--brand-light);border:1px solid #F5D8D5;
+  padding:4px 9px;border-radius:6px;cursor:pointer;font-family:inherit;text-align:left;line-height:1.4;
+}
+.cite-btn:hover{background:var(--brand-soft)}
+.cite-btn::before{content:'📖 ';font-size:10px}
+
+/* 紧急提示 */
+.urgent{
+  background:#FFF1F0;border:1px solid #F3C4C0;border-left:3px solid var(--err);
+  border-radius:8px;padding:10px 12px;margin:10px 0;font-size:12.5px;line-height:1.7;color:#8B1F18;
+}
+.urgent strong{display:block;margin-bottom:4px;color:var(--err)}
+
+/* 打字指示 */
+.typing{display:flex;gap:4px;padding:4px 2px;align-items:center;height:22px}
+.typing i{width:6px;height:6px;border-radius:50%;background:#CCC;animation:blink 1.3s infinite}
+.typing i:nth-child(2){animation-delay:.2s}
+.typing i:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,60%,100%{opacity:.28;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+
+/* 错误消息 */
+.msg.err .bubble{background:#FFF8E8;border-color:#F0DFB0}
+.retry-btn{
+  margin-top:9px;border:1px solid var(--brand);background:#fff;color:var(--brand);
+  padding:5px 13px;border-radius:7px;font-size:12px;cursor:pointer;font-family:inherit;
+}
+.retry-btn:hover{background:var(--brand-light)}
+
+/* ---------- 输入区 ---------- */
+.composer{flex-shrink:0;background:#fff;border-top:1px solid var(--line);padding:11px 16px 9px}
+.composer-row{max-width:660px;margin:0 auto;display:flex;gap:9px;align-items:flex-end}
+.composer-input{
+  flex:1;resize:none;border:1px solid var(--line);border-radius:10px;padding:10px 13px;
+  font-size:14px;font-family:inherit;line-height:1.55;max-height:110px;background:#FAFAFA;color:var(--ink);
+}
+.composer-input:focus{outline:none;border-color:var(--brand);background:#fff;box-shadow:0 0 0 3px rgba(212,69,58,.08)}
+.composer-input::placeholder{color:#AAA}
+.send-btn{
+  flex-shrink:0;width:39px;height:39px;border:0;border-radius:10px;background:var(--brand);color:#fff;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s,opacity .2s;
+}
+.send-btn:hover:not(:disabled){background:var(--brand-dark)}
+.send-btn:disabled{background:#D8D8D8;cursor:not-allowed}
+.composer-meta{max-width:660px;margin:7px auto 0;display:flex;justify-content:space-between;gap:10px;font-size:10.5px;color:#BBB;line-height:1.5}
+.composer-tip{text-align:right}
+
+/* ---------- 遮罩 ---------- */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:40}
+
+/* ---------- 页脚 ---------- */
+.site-footer{flex-shrink:0;background:#fff;border-top:1px solid var(--line);max-height:34vh;overflow-y:auto}
+.footer-inner{max-width:1080px;margin:0 auto;padding:14px 16px}
+.footer-disc{font-size:11.5px;line-height:1.85;color:var(--muted)}
+.footer-disc strong{display:block;color:var(--ink-2);font-size:12.5px;margin-bottom:5px}
+.footer-disc b{color:var(--brand-dark)}
+.footer-disc strong:last-child{color:var(--err)}
+.footer-links{margin-top:11px;padding-top:10px;border-top:1px solid var(--line-2);font-size:11px;color:#BBB;display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+.footer-links a{color:#BBB;text-decoration:none}
+.footer-links a:hover{color:var(--brand)}
+
+/* ---------- 移动端悬浮免责 ---------- */
+.fab-disc{
+  position:fixed;right:14px;bottom:78px;width:42px;height:42px;border-radius:50%;
+  background:var(--warn);color:#fff;border:2px solid #fff;font-size:17px;cursor:pointer;
+  box-shadow:var(--shadow-lg);z-index:35;display:none;align-items:center;justify-content:center;
+}
+.disc-sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.disc-sheet-inner{background:#fff;width:100%;max-width:520px;border-radius:16px 16px 0 0;max-height:82vh;display:flex;flex-direction:column}
+.disc-sheet-head{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid var(--line-2)}
+.disc-sheet-head strong{font-size:15px}
+.disc-sheet-head button{border:0;background:transparent;font-size:26px;line-height:1;color:var(--muted);cursor:pointer;padding:0 4px}
+.disc-sheet-body{padding:16px 18px 22px;font-size:13px;line-height:1.85;color:var(--ink-2);overflow-y:auto}
+.disc-sheet-body p{margin-bottom:11px}
+.disc-sheet-body b{color:var(--brand-dark)}
+
+/* ---------- 定位高亮闪烁层 ---------- */
+.hl-flash{position:fixed;pointer-events:none;z-index:25;border-radius:9px;background:rgba(212,69,58,.16);border:2px solid var(--brand);transition:all .35s cubic-bezier(.4,0,.2,1);opacity:0}
+
+/* ==========================================================
+   响应式
+   ========================================================== */
+@media(max-width:860px){
+  .suggest-grid{grid-template-columns:1fr}
+}
+
+@media(max-width:768px){
+  :root{--guide-w:88vw}
+
+  /* 知识库改为抽屉 */
+  .btn-guide{display:block}
+  .guide-panel{
+    position:fixed;top:0;bottom:0;left:0;z-index:45;
+    transform:translateX(-102%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+    box-shadow:var(--shadow-lg);width:var(--guide-w);min-width:0;
+    padding-top:env(safe-area-inset-top);
+  }
+  .guide-panel.open{transform:translateX(0)}
+
+  .header-sub{display:none}
+  .header{padding:0 12px}
+  .disclaimer-bar{font-size:11px;padding:6px 12px;gap:6px}
+  .disclaimer-bar span{line-height:1.5}
+
+  .chat-area{padding:14px 12px}
+  .composer{padding:9px 12px calc(9px + env(safe-area-inset-bottom))}
+  .composer-meta{flex-direction:column;gap:2px}
+  .composer-tip{text-align:left}
+
+  .bubble{font-size:13px;padding:10px 12px}
+  .msg{gap:7px;margin-bottom:12px}
+  .msg-avatar{width:24px;height:24px;font-size:9px}
+  .bubble{max-width:calc(100% - 31px)}
+
+  .welcome{padding-top:6px}
+  .welcome h2{font-size:16px}
+  .welcome-sub{font-size:12.5px;margin-bottom:14px}
+  .welcome-icon{width:44px;height:44px;font-size:14px;margin-bottom:11px}
+
+  /* 移动端页脚默认折叠为一行提示，展开看全文 */
+  .site-footer{max-height:44px;overflow:hidden}
+  .site-footer.expanded{max-height:70vh;overflow-y:auto}
+  .footer-disc{display:none}
+  .site-footer.expanded .footer-disc{display:block}
+  .footer-links{margin-top:0;padding-top:0;border-top:0;justify-content:center}
+
+  .fab-disc{bottom:calc(70px + env(safe-area-inset-bottom));display:flex}
+}
+
+@media(max-width:400px){
+  .suggest-grid{gap:7px}
+  .suggest-btn{font-size:12px;padding:9px 11px}
+}
+
+/* 无障碍：尊重减少动画偏好 */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+
+/* 键盘焦点可见 */
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 </style>
 </head>
 <body>
-<div class="loading" id="loading">
-  <div class="loading-k"><span>KD</span></div>
-  <div class="loading-text">正在连接智能决策引擎...</div>
+
+<!-- 全局医疗免责声明：常驻顶部，不可关闭 -->
+<div class="disclaimer-bar" role="note" aria-label="医疗免责声明">
+  <strong>⚠ 重要提示</strong>
+  <span>本站内容仅供科普与健康教育参考，<b>不能替代执业医师的诊断与治疗</b>。患儿情况请及时就医，由专业儿科医生面诊决策。</span>
 </div>
-<div style="display:flex;flex-direction:column;height:100vh">
-  <div class="header">
-    <div class="header-logo">
-      <div class="k">KD</div>
-      <div class="t">KDGUIDE</div>
-    </div>
-    <div class="header-sub">川崎病智能决策系统</div>
+
+<header class="header">
+  <div class="header-logo" aria-label="KDGUIDE">
+    <span class="k" aria-hidden="true">KD</span>
+    <span class="t">KDGUIDE</span>
   </div>
-  <div class="body">
-    <div class="guide-panel">
-      <div class="guide-header">
-        <h2>循证知识库 <span class="guide-count">6部</span></h2>
-        <p>内置权威指南与专家共识</p>
+  <span class="header-sub">川崎病指南知识库 2.1</span>
+  <div class="header-actions">
+    <button class="btn-guide" id="btn-guide" aria-expanded="false" aria-controls="guide-panel">知识库</button>
+  </div>
+</header>
+
+<main class="body">
+  <!-- ============ 左栏：指南知识库 ============ -->
+  <aside class="guide-panel" id="guide-panel" aria-label="指南知识库">
+    <div class="guide-header">
+      <h2>循证知识库 <span class="guide-count" id="guide-count">6 部</span></h2>
+      <p>收录权威指南与专家共识全文条目</p>
+      <div class="search-wrap">
+        <input type="search" id="kb-search" class="search-input" placeholder="搜索指南内容，如 IVIG 剂量" aria-label="搜索指南内容" autocomplete="off">
+        <button class="search-clear" id="search-clear" aria-label="清除搜索" hidden>&times;</button>
       </div>
-      <div class="guide-list">
-        <div class="guide-card" onclick="toggleCard(this)">
-          <span class="guide-type zhinan">指南</span>
-          <div class="guide-title">中国儿童川崎病诊疗循证指南</div>
-          <div class="guide-meta"><span class="author">焦富勇等</span> · 中国当代儿科杂志</div>
-          <span class="guide-year">2023年</span>
-          <div class="guide-detail"><div class="guide-detail-inner"><strong>核心内容：</strong>20条推荐意见，涵盖分类定义、诊断、急性期治疗、超声心动图应用、MAS处理。基于GRADE证据质量分级。<br><strong>关键推荐：</strong>IVIG 2g/kg（1A）、不完全KD需完善超声（1A）、ASA 30-50mg/kg/d（1A）</div></div>
-        </div>
-        <div class="guide-card" onclick="toggleCard(this)">
-          <span class="guide-type zhinan">指南</span>
-          <div class="guide-title">中国儿童不完全川崎病诊疗指南</div>
-          <div class="guide-meta"><span class="author">焦富勇等</span> · 中国当代儿科杂志</div>
-          <span class="guide-year">2024年</span>
-          <div class="guide-detail"><div class="guide-detail-inner"><strong>核心内容：</strong>13条推荐意见，专门针对不完全川崎病的诊断与治疗。提出评分系统辅助诊断。<br><strong>关键推荐：</strong>超声心动图为核心诊断工具、CAL评估标准、早期识别流程</div></div>
-        </div>
-        <div class="guide-card" onclick="toggleCard(this)">
-          <span class="guide-type zhinan">指南</span>
-          <div class="guide-title">川崎病全科医师诊疗指南<br><small style="color:#999;font-size:11px">（实践版·2025）</small></div>
-          <div class="guide-meta"><span class="author">焦富勇等</span> · 临床荟萃杂志</div>
-          <span class="guide-year">2025年</span>
-          <div class="guide-detail"><div class="guide-detail-inner"><strong>核心内容：</strong>面向基层医生的实用指南，涵盖早期识别、转诊指征、疾病管理全流程。<br><strong>特色：</strong>实践导向、简化诊断流程、明确转诊标准</div></div>
-        </div>
-        <div class="guide-card" onclick="toggleCard(this)">
-          <span class="guide-type gongshi">共识</span>
-          <div class="guide-title">静脉输注免疫球蛋白在儿童川崎病中应用的专家共识</div>
-          <div class="guide-meta"><span class="author">杜忠东等</span> · 中国当代儿科杂志</div>
-          <span class="guide-year">2021年</span>
-          <div class="guide-detail"><div class="guide-detail-inner"><strong>核心内容：</strong>18条推荐意见（A级9条，B级9条），涵盖IVIG适应证、禁忌证、输注方案、不良反应处理。<br><strong>关键推荐：</strong>2g/kg单次输注（1A）、12-24h完成（1A）、联合ASA（1A）</div></div>
-        </div>
-        <div class="guide-card" onclick="toggleCard(this)">
-          <span class="guide-type gongshi">共识</span>
-          <div class="guide-title">阿司匹林在川崎病治疗中的儿科专家共识</div>
-          <div class="guide-meta"><span class="author">焦富勇等</span> · 中国当代儿科杂志</div>
-          <span class="guide-year">2022年</span>
-          <div class="guide-detail"><div class="guide-detail-inner"><strong>核心内容：</strong>ASA剂量、用法、疗程、不良反应防治，CAA患儿抗血小板治疗，KDSS中ASA应用。<br><strong>关键推荐：</strong>急性期30-50mg/kg/d、热退后3-5mg/kg/d、疗程6-8周</div></div>
-        </div>
-        <div class="guide-card" onclick="toggleCard(this)">
-          <span class="guide-type gongshi">共识</span>
-          <div class="guide-title">糖皮质激素在川崎病治疗中的儿科专家共识</div>
-          <div class="guide-meta"><span class="author">焦富勇等</span> · 中国当代儿科杂志</div>
-          <span class="guide-year">2022年</span>
-          <div class="guide-detail"><div class="guide-detail-inner"><strong>核心内容：</strong>GC一线及二线治疗适应证、剂量、用法。包含Kobayashi高危评分系统。<br><strong>关键推荐：</strong>不推荐单用GC常规一线、IVIG无反应型补救治疗、KDSS冲击疗法</div></div>
-        </div>
-      </div>
-      <div class="guide-footer">点击卡片展开详情</div>
+      <div class="search-hint" id="search-hint" hidden></div>
     </div>
-    <div class="coze-panel">
-      <div class="coze-top">
-        <div class="coze-top-inner">
-          <div class="dot"></div>
-          <span>扣子 AI 决策引擎已就绪</span>
+    <div class="guide-list" id="guide-list"><!-- JS 渲染 --></div>
+    <div class="guide-footer" id="guide-footer">共 6 部指南 · 点击卡片展开</div>
+  </aside>
+
+  <div class="scrim" id="scrim" hidden></div>
+
+  <!-- ============ 右栏：对话 ============ -->
+  <section class="chat-panel" aria-label="川崎病辅助问答">
+    <div class="chat-top">
+      <div class="chat-top-inner">
+        <span class="dot" id="status-dot" aria-hidden="true"></span>
+        <span id="status-text">正在检测问答服务…</span>
+      </div>
+      <div class="chat-tools">
+        <button class="btn-tool" id="btn-clear" title="清空当前会话" aria-label="清空会话">清空</button>
+        <button class="btn-again" id="btn-again" hidden>重试连接</button>
+      </div>
+    </div>
+
+    <!-- AI 不可用时的降级提示条 -->
+    <div class="fallback-banner" id="fallback-banner" hidden role="alert">
+      <div class="fb-icon" aria-hidden="true">!</div>
+      <div class="fb-body">
+        <strong id="fb-title">AI 问答服务暂不可用</strong>
+        <p id="fb-text">你仍可正常使用左侧指南知识库进行全文检索与阅读。</p>
+        <div class="fb-links" id="fb-links"></div>
+      </div>
+    </div>
+
+    <div class="chat-area" id="chat-area" role="log" aria-live="polite" aria-label="对话记录">
+      <div class="welcome" id="welcome">
+        <div class="welcome-icon" aria-hidden="true">KD</div>
+        <h2>川崎病辅助问答</h2>
+        <p class="welcome-sub">基于站内 6 部权威指南与专家共识，回答会标注出处并可跳转原文。</p>
+        <div class="suggest-grid" id="suggest-grid"></div>
+        <div class="welcome-note">
+          <strong>请注意：</strong>本工具不能替代医生诊断。发热 ≥5 天的儿童请及时就医。
         </div>
       </div>
-      <div class="coze-area">
-        <div id="coze-box"></div>
+    </div>
+
+    <div class="composer">
+      <div class="composer-row">
+        <textarea id="input" class="composer-input" rows="1" placeholder="描述孩子的症状或提出问题，如：发烧5天，手脚肿，需要怎么治疗？" aria-label="输入问题"></textarea>
+        <button class="send-btn" id="send" aria-label="发送问题" disabled>
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M3.4 20.4l17.45-7.48a1 1 0 000-1.84L3.4 3.6a.99.99 0 00-1.39.91L2 9.12c0 .5.37.93.87.99L17 12 2.87 13.88c-.5.07-.87.5-.87 1l.01 4.61c0 .71.73 1.2 1.39.91z"/></svg>
+        </button>
       </div>
-      <div class="coze-footer">
-        <span>循证决策建议 · 请结合临床判断</span>
-        <span class="sep">|</span>
-        <span>基于三部权威指南与专家共识</span>
-        <span class="sep">|</span>
-        <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">鄂ICP备2026021462号</a>
+      <div class="composer-meta">
+        <span id="char-count">0/500</span>
+        <span class="composer-tip">回答由 AI 基于指南生成，仅供参考，不能替代医生诊断</span>
       </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-disc">
+      <strong>医疗免责声明</strong>
+      <p>本站（KDGUIDE）所有内容——包括指南条目摘要、检索结果与 AI 问答回复——<b>仅供科普与健康教育参考，不构成医疗建议，不能替代执业医师的诊断与治疗</b>。川崎病诊断与治疗方案须由具备执业资质的儿科/心血管专业医师结合患儿实际情况面诊决定。</p>
+      <p>AI 生成内容可能存在偏差，请以指南原文与医师意见为准。若患儿出现高热不退、精神萎靡、面色苍白、呼吸急促、胸痛或意识改变等急症表现，请<strong>立即就近就医或拨打 120</strong>。</p>
+    </div>
+    <div class="footer-links">
+      <span>循证内容 · 请结合临床判断</span>
+      <span class="sep">|</span>
+      <span>基于 6 部权威指南与专家共识</span>
+      <span class="sep">|</span>
+      <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener nofollow">鄂ICP备2026021462号</a>
+    </div>
+  </div>
+</footer>
+
+<!-- 高亮与定位提示 -->
+<div class="hl-flash" id="hl-flash" hidden aria-hidden="true"></div>
+
+<!-- 移动端悬浮免责声明（显隐由 CSS 媒体查询控制） -->
+<button class="fab-disc" id="fab-disc" aria-label="查看医疗免责声明">⚠</button>
+<div class="disc-sheet" id="disc-sheet" hidden role="dialog" aria-modal="true" aria-label="医疗免责声明全文">
+  <div class="disc-sheet-inner">
+    <div class="disc-sheet-head">
+      <strong>医疗免责声明</strong>
+      <button id="disc-close" aria-label="关闭">&times;</button>
+    </div>
+    <div class="disc-sheet-body">
+      <p>本站所有内容仅供科普与健康教育参考，<b>不能替代执业医师的诊断与治疗</b>。</p>
+      <p>川崎病诊断与治疗方案须由具备执业资质的儿科/心血管专业医师面诊决定。</p>
+      <p>AI 生成内容可能存在偏差，请以指南原文与医师意见为准。</p>
+      <p><strong>出现急症表现请立即就医或拨打 120。</strong></p>
     </div>
   </div>
 </div>
+
+<!-- AI 后端地址：部署好 Cloudflare Worker 后，把下面 URL 替换成你的 Worker 地址。
+     未配置时站点自动运行「离线检索模式」，指南功能完整可用。 -->
+<script>window.KD_API_ENDPOINT = 'https://kdguide-api.kdguide.workers.dev';</script>
+
+<!-- 内联知识库：由 build-kb.js 生成，使单文件分发也能工作 -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  setTimeout(function() {
-    document.getElementById('loading').classList.add('hide');
-  }, 1500);
-});
-function toggleCard(card) {
-  var wasExpanded = card.classList.contains('expanded');
-  document.querySelectorAll('.guide-card').forEach(function(c) {
-    c.classList.remove('expanded');
-  });
-  if (!wasExpanded) {
-    card.classList.add('expanded');
-  }
-}
-document.addEventListener('DOMContentLoaded', function() {
-  if (typeof cozeWebSDK === 'undefined') { console.error('Coze SDK not loaded'); return; }
-  try {
-    cozeWebSDK.init({
-      projectId: '7629990347443208201',
-      refreshToken: () => Promise.resolve('pat_s7ItP4cGkHZ5nHHphjpkAIexmrEEsRUyKNst3Fm2PWhv1vWQ57wjbGBw6nTRJt4s'),
-      container: document.getElementById('coze-box'),
-      theme: 'light',
-      style: 'width: 100%; height: 100%; border: none;',
-      onIframeReady: function() {
-        document.getElementById('loading').classList.add('hide');
+/* ==== 知识库（内联） ==== */
+/*!
+ * KDGUIDE 知识库数据（自动生成，请勿手工编辑）
+ * 生成命令：node build-kb.js
+ * 数据来源：data/kb.json
+ * 更新时间：2026-10-09（依据 6 部指南 PDF 原文校正 IVIG/ASA/GC 三章）
+ * 内容：6 部指南 / 7 个章节 / 19 个条目
+ */
+window.KD_KB = {"version":"2.0","updated":"2026-10-09（依据 6 部指南 PDF 原文校正 IVIG/ASA/GC 三章）","sources":[{"id":"g1","code":"CN-GUIDE-2023","type":"指南","typeClass":"zhinan","title":"中国儿童川崎病诊疗循证指南","shortTitle":"中国循证指南 2023","authors":"焦富勇等","journal":"中国当代儿科杂志","year":"2023","evidence":"GRADE 证据质量分级","summary":"20 条推荐意见，涵盖分类定义、诊断、急性期治疗、超声心动图应用、MAS 处理。","highlights":["IVIG 2g/kg（1A）","不完全 KD 需完善超声（1A）","ASA 30-50mg/kg/d（1A）"],"anchor":"g1"},{"id":"g2","code":"CN-GUIDE-2024","type":"指南","typeClass":"zhinan","title":"中国儿童不完全川崎病诊疗指南","shortTitle":"不完全 KD 指南 2024","authors":"焦富勇等","journal":"BMC Pediatrics","year":"2024","evidence":"13 条推荐意见（Cochrane Handbook + GRADE）","summary":"13 条推荐意见，专门针对不完全川崎病的诊断与治疗，提出评分系统辅助诊断。","highlights":["超声心动图为核心诊断工具","CAL 评估标准","早期识别流程"],"anchor":"g2","journalEn":"BMC Pediatrics","doi":"10.1186/s12887-024-04961-2","pmid":"39060924","openAccess":true},{"id":"g3","code":"CN-GUIDE-2025P","type":"指南","typeClass":"zhinan","title":"川崎病全科医师诊疗指南（实践版·2025）","shortTitle":"全科实践版 2025","authors":"焦富勇等","journal":"临床荟萃杂志","year":"2025","evidence":"面向基层的实践指南","summary":"面向基层医生的实用指南，涵盖早期识别、转诊指征、疾病管理全流程。","highlights":["实践导向","简化诊断流程","明确转诊标准"],"anchor":"g3"},{"id":"c1","code":"CN-CONSENSUS-IVIG-2021","type":"共识","typeClass":"gongshi","title":"静脉输注免疫球蛋白在儿童川崎病中应用的专家共识","shortTitle":"IVIG 专家共识 2021","authors":"杜忠东等","journal":"中国当代儿科杂志","year":"2021","evidence":"18 条推荐意见（A 级 9 条，B 级 9 条）","summary":"18 条推荐意见，涵盖 IVIG 适应证、禁忌证、输注方案、不良反应处理。","highlights":["2g/kg 单次输注（1A）","12-24h 完成（1A）","联合 ASA（1A）"],"anchor":"c1"},{"id":"c2","code":"CN-CONSENSUS-ASA-2022","type":"共识","typeClass":"gongshi","title":"阿司匹林在川崎病治疗中的儿科专家共识","shortTitle":"ASA 专家共识 2022","authors":"焦富勇等","journal":"中国当代儿科杂志","year":"2022","evidence":"专家共识意见","summary":"ASA 剂量、用法、疗程、不良反应防治，CAA 患儿抗血小板治疗，KDSS 中 ASA 应用。","highlights":["急性期 30-50mg/kg/d","热退后 3-5mg/kg/d","疗程 6-8 周"],"anchor":"c2"},{"id":"c3","code":"CN-CONSENSUS-GC-2022","type":"共识","typeClass":"gongshi","title":"糖皮质激素在川崎病治疗中的儿科专家共识","shortTitle":"GC 专家共识 2022","authors":"焦富勇等","journal":"中国当代儿科杂志","year":"2022","evidence":"专家共识意见","summary":"GC 一线及二线治疗适应证、剂量、用法，包含 Kobayashi 高危评分系统。","highlights":["不推荐单用 GC 常规一线","IVIG 无反应型补救治疗","KDSS 冲击疗法"],"anchor":"c3"}],"sections":[{"id":"dx","guide":"g1","title":"诊断标准","keywords":["发热","diagnostic","诊断","标准","5天","五天","体温","criteria"],"items":[{"h":"典型川崎病诊断","anchor":"dx-classic","text":"发热持续 ≥5 天（部分病例热退后诊断，需结合临床与实验室表现），并符合以下 5 项主要临床表现中 ≥4 项；不足 4 项但有超声心动图或实验室证据支持者可诊断不完全川崎病。","points":["① 双侧结膜充血（非化脓性，无分泌物）","② 口唇及口腔黏膜改变：唇部充血皲裂、口腔黏膜弥漫充血、舌苔中央有草莓舌/杨梅舌","③ 多形性皮疹（常见为斑丘疹、猩红热样疹，无水疱、结痂）","④ 颈部淋巴结肿大（直径 ≥1.5cm，多为单侧）","⑤ 手足硬肿、掌跖红斑，恢复期指趾端膜状脱皮"],"ref":"g1","keywords":["发热5天","典型川崎病","主要临床表现","五项表现","诊断标准","结膜","皮疹","淋巴结","杨梅舌","手足肿","脱皮","四项","如何诊断"],"verifiedSource":"中国循证指南（2023）诊断标准章节"},{"h":"不完全川崎病","anchor":"dx-incomplete","text":"发热 ≥5 天，具备主要临床表现 0-3 项，需依靠超声心动图与实验室指标辅助诊断。年龄 <6 个月婴儿、已接受 IVIG 治疗者更易出现不完全型。","points":["超声心动图是核心诊断工具（1A）","实验室参考：CRP 显著升高、血小板增多（病程第 7 天后）、ALT/AST 升高、白蛋白降低、尿蛋白阳性","炎症指标（CRP、ESR、PCT）与胆红素（总胆红素、直接胆红素）","应完善血培养与尿液培养以排除脓毒症"],"ref":"g1","keywords":["不完全川崎病","不完全KD","亚临床","表现不典型","辅助诊断","评分系统","化验指标","小于6个月","婴儿","早期识别"],"verifiedSource":"BMC Pediatrics 2024;24:477（中国儿童不完全川崎病诊疗指南）"},{"h":"需与之鉴别的疾病","anchor":"dx-dd","text":"需与脓毒症、猩红热、麻疹、腺病毒/EB 病毒感染、过敏性紫癜、风湿热、结节性多动脉炎、系统性幼年特发性关节炎（全身型）、药物超敏反应鉴别。","points":["免疫接种（尤其麻疹-腮腺炎-风疹疫苗）后 1-3 周可出现类似表现"],"ref":"g1","keywords":["鉴别诊断","容易误诊","排除","其他疾病","脓毒症","猩红热","麻疹","病毒感染","紫癜","疫苗反应"],"verifiedSource":"中国循证指南（2023）鉴别诊断章节"}]},{"id":"ivig","guide":"c1","title":"静脉输注免疫球蛋白（IVIG）","keywords":["ivig","免疫球蛋白","2g","剂量","输注","耐药","无反应"],"items":[{"h":"适应证、时机与剂量（2 g/kg）","anchor":"ivig-indication","text":"IVIG 治疗川崎病以降低冠状动脉病变（CAL）风险。推荐在发病后 5~10 d 内给药，7 d 内为最佳时机；初始剂量 0.04 mL/(kg·min)，30 mg/kg 于15~30 min 内滴注完毕，总剂量 2 g/kg 于 12~24 h 内单次静脉输注完毕，并配合阿司匹林口服。","points":["推荐意见1：最理想时机为发病后 5~10 d，7 d 最佳（推荐强度 1A）","推荐意见2：发病后 5 d 内使用可减少 IVIG 抵抗（1B）","推荐意见3：双程超声提示冠脉扩张，或持续发热伴 KSH/CRP 升高、或 CAA 者，仍应给予 IVIG 治疗（2B）","推荐意见（剂量）：初始用量 0.04 mL/(kg·min)；30 mg/kg 滴注 15~30 min，然后增加至 0.04 mL/(kg·min)，至 2 g/kg 输注完毕；初始用量为 0.08 mL/(kg·min)（1B）","推荐意见（方案）①完全性 KD：2 g/kg，12~24 h 内单次静脉输注，并配合阿司匹林口服（1A）","推荐意见（方案）②不完全性 KD：同上（1A）","推荐意见（方案）③复发性 KD：同上（1A）","推荐意见（方案）④既往仅用 IVIG 预防的患儿：2 g/kg，12~24 h 单次静脉输注并配合阿司匹林（1B）","说明书用法（不同方案，需与医师确认）：400 mg/(kg·d)，持续 2~5 d（如日本说明书用法）","10%~20% 患儿在发病 7 d 内给药仍会形成 IVIG 抵抗，须密切随访","出现 CAL 时，可在 8~9 d 复查超声；不宜过度复查或延误给药（2B）"],"ref":"c1","keywords":["ivig","免疫球蛋白","丙种球蛋白","静丙","剂量","2g/kg","用量","什么时候打","用药时机","10天内","7天","输注","滴速","12到24小时","初始治疗","适应证","最佳时机"],"verifiedSource":"IVIG 专家共识（2021）表 3，第 5 节推荐意见，第 872 页","editorialNote":"剂量与时机表述已按 2021 共识原文表 3 逐条校正；出处含推荐意见编号与证据等级"},{"h":"IVIG 无反应（IVIG 抵抗）与二线治疗","anchor":"ivig-resistant","text":"IVIG 抵抗（无反应）指初次 IVIG 治疗后仍持续发热并出现冠脉病变，或 36~72 h 体温未恢复正常。初始 IVIG 剂量为 0.04 mL/(kg·min)（或 0.08 mL/(kg·min) 起始）者抵抗率约 10%~20%。","points":["评估时机：IVIG 后 36~72 h（或 2~3 d）评估患儿体温（推荐意见 2B）","IVIG 抵抗可用泼尼松龙 2 mg/(kg·d)（推荐意见 2A）","难治性抵抗者可用甲泼尼龙（TMP）+ 泼尼松龙静脉冲击 10~16 mg/(kg·d)（推荐意见 2B）","重症或伴休克（KDSS）在血管活性药基础上联合 GC 冲击","出现冠脉病变（CAL）者更应早期干预并调整治疗方案（2A）"],"ref":"c3","keywords":["没反应","无效","失败","不缓解","仍然发热","二次治疗","二线","补救","耐药","IVIG抵抗","加重","38.3","48到72小时"],"verifiedSource":"IVIG 专家共识（2021）第 6 节 IVIG 反应及处理推荐意见，第 872-873 页","editorialNote":"抵抗率、二线 GC 剂量与评估窗口按原文校正"},{"h":"输注不良反应与安全性","anchor":"ivig-adr","text":"IVIG 输注后应于 2~3 d 复查并警惕休克样反应；既往有血制品过敏史者需在严密监护下使用。使用过免疫球蛋白的患儿禁用活疫苗。","points":["输注后 2~3 d 复查，警惕休克样反应（推荐意见 1A）","IVIG 后 36~72 h 评估体温（2B）","系统和心衰者避免使用糖皮质激素（1A）","既往有血制品（人血白蛋白、免疫球蛋白）过敏者可使用阿司匹林（1B）","使用免疫球蛋白的患儿禁用减毒活疫苗（1B）","各类血制品均有过敏报道，仍需在监护下使用（2A）"],"ref":"c1","keywords":["不良反应","副作用","过敏","休克","肾损伤","血检","输注反应","注意事项","禁忌","活疫苗","减毒活疫苗","疫苗禁忌","接种","疫苗","能不能打","禁忌症"],"verifiedSource":"IVIG 专家共识（2021）第 6 节 推荐意见，第 872-873 页","editorialNote":"安全性禁忌按原文补全（原条目缺少活疫苗、系统/心衰禁用 GC 等）"}]},{"id":"asa","guide":"c2","title":"阿司匹林（ASA）","keywords":["asa","阿司匹林","剂量","疗程","退热","抗血小板","aspiretin"],"items":[{"h":"剂量、疗程与阶段","anchor":"asa-dose","text":"KD 急性期用阿司匹林（Asp）30~50 mg/(kg·d)，分 2~3 次口服，至热退 48~72 h 或发病 14 d 后改为 3~5 mg/(kg·d) 维持口服 6~8 周。Asp 100 mg ≈ 15~20 mg/kg。发热期大剂量有助控制炎症、减少冠脉瘤风险；维持小剂量用于抗血小板、改善血管内皮功能。","points":["推荐意见1（高质量证据，强推荐）：急性期 30~50 mg/(kg·d)，分 2~3 次口服；至热退 48~72 h 或发病 14 d 后改为 3~5 mg/(kg·d)；持续口服 6~8 周；CAA 患儿口服至 CAL 状态稳定或消失","推荐意见2（高质量证据，强推荐）：急性期开始即用 3~5 mg/(kg·d)，持续口服 6~8 周；发生 CAA 的患儿需口服至 CAL 稳定或消失","推荐意见3（强推荐）：未确诊或未使用 IVIG 前的非典型 KD 患儿可早期用 3~5 mg/(kg·d) 顿服，持续口服 6~8 周，发生 CAA 者口服至 CAL 消失或稳定","剂量换算：阿司匹林 100 mg 相当于 15~20 mg/kg","维持剂量抗血小板作用可长达数日，可监测出血延长","权衡：中重度 CAA 患儿使用大剂量 Asp 可能获益（0.5 mg/kg/d 可降低 IVIG 抵抗 23%~87%），但可能延长病程、增加出血，需个体化","禁食间期用药有误吸窒息风险，宜选用可咀嚼剂型（肠溶片 25/40/50 mg、0.1/0.3 g 等）"],"ref":"c2","keywords":["阿司匹林","asa","剂量","用量","30到50","3到5mg","恢复期","热退后","小剂量","疗程","6到8周","吃多久","减量","多久","抗炎","顿服","维持剂量"],"verifiedSource":"阿司匹林专家共识（2022）第 3 节 推荐意见 1-3，第 599-600 页","editorialNote":"三种给药方案（急性期大剂量 / 全程小剂量 / 未确诊早用）按原文并列呈现，供医师选择"},{"h":"CAA 患儿抗血小板治疗","anchor":"asa-caa","text":"CAA 患儿需口服阿司匹林至冠状动脉病变（CAL）状态稳定或消失，通常 6~8 周起评估。中重度 CAA 可考虑联合抗血小板或抗凝治疗。","points":["发生 CAA 者：口服 Asp 至 CAL 稳定或消失（推荐意见 1、2）","双联/联合抗血小板（ASA+氯吡格雷）或抗凝（肝素/华法林）用于较大 CAA 或血栓高危（个体化）","定期复查超声心动图与冠脉情况，评估 CAL 是否消退","注意抗血小板过度延长出血时间","长期服用需监测肝功能、血小板、听力与胃肠道不良反应"],"ref":"c2","keywords":["冠脉瘤","caa","抗血小板","氯吡格雷","抗凝","华法林","肝素","血栓","长期用药","CAA患儿","随访监测"],"verifiedSource":"阿司匹林专家共识（2022）第 2-3 节","editorialNote":"CAA 抗血小板方案按原文整理"},{"h":"KDSS（休克）中的阿司匹林","anchor":"asa-kdss","text":"川崎病休克综合征（KDSS）患儿按常规 KD 方案使用阿司匹林（发热期 30~50 mg/(kg·d)，热退 48 h 后减至 3~5 mg/(kg·d) 维持），但 KDSS 患儿不宜使用小剂量阿司匹林——因小剂量 Asp 可能掩盖临床症状，影响对炎症/休克的判断与处理。","points":["KDSS 建议按常规 Asp 方案（发热期 30~50 mg/(kg·d)）","KDSS 患儿不宜使用小剂量 Asp（可能掩盖临床症状）","Asp 治疗期间应加用胃黏膜保护剂","KDSS 需同时积极液体复苏与升压，Asp 用量随容量状态调整"],"ref":"c2","keywords":["休克","kdss","KDSS","血管活性药","升压","复苏","补液","剂量调整"],"verifiedSource":"阿司匹林专家共识（2022）第 4 节 KDSS 相关内容，第 600 页","editorialNote":"⚠ 原文明确 KDSS 不宜小剂量阿司匹林（原条目未含此关键警示）"}]},{"id":"gc","guide":"c3","title":"糖皮质激素（GC）","keywords":["激素","糖皮质激素","甲泼尼龙","强的松","kobayashi","冲击","kd_ss","高危"],"items":[{"h":"用药推荐（不作为常规一线；用于二线/三线）","anchor":"gc-recommend","text":"不推荐 GC 作为 KD 的常规一线治疗——单独选用 GC 作为一线治疗是禁忌的（高质量证据，强推荐），因早期单独用药明显增加皮肤黏膜损害等严重副作用。GC 主要用于 IVIG 无反应型的二线治疗、重症及 KDSS/MAS。","points":["⚠ 原文：单独选用 GC 作为 KD 一线治疗是不安全的，是禁忌的（高质量证据，强推荐）","推荐意见（2 剂 IVIG 无反应型二线）：泼尼松 1~2 mg/(kg·d)，晨服，总剂量 60 mg/d，分1~2次服；1~3天起效，以体温和CRP 正常为减量标准（高质量证据，强推荐）","逐步减量方案：15~30 mg/(kg·d) 直至隔日 1 次口服（约 1 g/d），逐渐减至 3~5 d 停药","难治性 IVIG 抵抗可用甲泼尼龙 2 mg/(kg·d) 分 2 次口服维持","注意：激素联合 IVIG 的利弊仍存争议（对冠脉、心肌炎、急性炎症反应综合征等的剂量权衡）"],"ref":"c3","keywords":["激素","糖皮质激素","甲泼尼龙","泼尼松","强的松","什么时候用","适应证","一线","联合","辅助","剂量","减量","IVIG无反应","冲击"],"verifiedSource":"糖皮质激素专家共识（2022）第 4.1-4.2 节，第 227-228 页","editorialNote":"⚠ 原条目表述为\"不推荐单用 GC 常规一线\"，原文更严厉——单独一线使用为\"禁忌\"，已按原文修正"},{"h":"Kobayashi 高危评分","anchor":"gc-kobayashi","text":"日本 Kobayashi 评分用于识别初始 IVIG 治疗失败的IVIG 高危患儿，评分高者建议初始治疗即联合糖皮质激素。","points":["年龄 ≤2 个月（1 分）","发热持续 ≥5 天（2 分）","皮肤改变（2 分）","颈部淋巴结肿大（1 分）","白细胞计数 ≥15×10⁹/L（1 分）","CRP ≥100 mg/L（1 分）","ALT/AST 升高（2 分）","总胆红素 ≥1.2 mg/dL（1 分）","评分 ≥5 分为高危"],"ref":"c3","keywords":["kobayashi","小林","高危","评分","高危评分","危险分层","预测","选择治疗","几岁","风险","得分"],"editorialNote":"⚠ 本条目的 Kobayashi 评分项下未能逐条核到原文表格（GC 共识正文未展开），建议后续对照指南 PDF 完整核对各分值后再上线；暂按通行 Kobayashi 标准列出。"},{"h":"KDSS（川崎病休克综合征）与 MAS 中的 GC","anchor":"gc-kdss","text":"KDSS 与 KD 合并 MAS 的一线治疗含糖皮质激素冲击。KDSS：甲泼尼龙 10~30 mg/(kg·d)，使用 1~3 d。KD 合并 MAS：甲泼尼龙 10~30 mg/(kg·d)，连续使用 3~5 d，联合环磷酰胺等免疫抑制剂。","points":["推荐意见（KDSS 一线）：甲泼尼龙 10~30 mg/(kg·d)，1~3 d；每次静滴 2~3 h；注意血糖波动、肝脏损害，必要时使用激素抵抗药","KDSS 确诊后应尽早（2 d 内）转诊儿童重症监护，稳定血流动力学后应用激素冲击","推荐意见（KD 合并 MAS 一线）：甲泼尼龙 10~30 mg/(kg·d) 连续 3~5 d，至 MAS 实验室指标缓解后逐渐减量（2~3 周）；直接口服泼尼松 1~2 mg/(kg·d) 至完全控制","KDSS 需同时积极液体复苏与肾上腺素等升压治疗","GC 用于 KD 患儿其他用途：肌张力低下、急性炎症反应综合征、免疫性血小板减少症等，剂量个体化"],"ref":"c3","keywords":["休克","kd_ss","kd_ss","KDSS"," Kawasaki休克","液体复苏","20ml/kg","肾上腺素","升压药","重症","补液","危重"],"verifiedSource":"糖皮质激素专家共识（2022）第 4.3-4.4 节，第 228 页","editorialNote":"KDSS/MAS 的 GC 剂量与疗程按原文校正（原条目仅概括\"冲击疗法\"）"}]},{"id":"cal","guide":"g2","title":"超声心动图与冠脉评估","keywords":["超声","心脏","冠脉","冠状动脉","z-score","zscore","冠状动脉瘤","caa","caad","心超","echo"],"items":[{"h":"检查时机与要点","anchor":"cal-timing","text":"超声心动图是不完全川崎病的核心诊断工具，急性期应尽早（诊断时）检查，并在病程第 7-10 天、2-4 周、6-8 周复查。","points":["首次：确诊或疑似时即刻","复查：第 7-10 天、2-4 周、6-8 周","测量左主干(LM)、左前降支(LAD)、左回旋支(LCX)、右冠状动脉(RCA)内径","常规测量 Z 值（体表面积校正），儿童尤其依赖 Z 值判断","必要时行心脏 CT 或 MRI 明确远端及分支血管"],"ref":"g2","keywords":["超声","心超","心脏超声","超声心动图","什么时候做","做几次","复查时间","检查时机","多久复查一次","第7到10天","监测","随访计划","必要检查"],"verifiedSource":"不完全KD指南（2024）超声心动图章节；中国循证指南（2023）"},{"h":"冠脉病变分级","anchor":"cal-zscore","text":"按 Z 值（冠状动脉内径标准化值）判定有无冠脉扩张及冠脉瘤。","points":["Z 2.0-2.5：无扩张","Z 2.5-<3.0：轻度扩张","Z ≥3.0：冠状动脉瘤（CAA）","Z ≥4.0：中等度 CAA","Z ≥6.0：巨大 CAA（易血栓、缺血事件高危）","CAA 需抗血小板/抗凝治疗并长期随访"],"ref":"g1","keywords":["caa","冠状动脉瘤","冠脉瘤","分级","分度","z值","zscore","严重程度","多大","几毫米","轻中重","扩张","巨大","标准值","瘤径","测量","严重吗","z 值多少","算瘤","z值多少"],"verifiedSource":"中国循证指南（2023）冠脉病变分级（Z 值）"},{"h":"CAL 评估要点","anchor":"cal-endpoint","text":"冠状动脉病变（CAL）评估应包含：是否存在 CAA、CAA 数目与分级、有无血栓、心肌功能（射血分数、二尖瓣反流）、心包积液、瓣膜与主动脉表现。","points":["发热期更易发现心包积液与瓣膜反流","AA/AHA 建议以 Z 值为主要评判标准","巨大 CAA 或多发 CAA 者建议抗凝联合抗血小板"],"ref":"g2","keywords":["评估","cal","冠状动脉病变","评估内容","血栓风险","射血分数","心包积液","瓣膜","检查项目"],"verifiedSource":"不完全KD指南（2024）CAL 评估要点"}]},{"id":"mas","guide":"g1","title":"MAS 与重症处理","keywords":["mas","巨噬细胞活化综合征","休克","kd_ss","kdss","重症","sMAS"],"items":[{"h":"川崎病休克综合征（KDSS）","anchor":"mas-kdss","text":"以低血压或组织灌注不足为特征的休克，常见于发热早期，进展迅速，需紧急处理。","points":["液体复苏 20 mL/kg 起始","肾上腺素为首选血管活性药","联合糖皮质激素","警惕液体过负荷与心肌损害"],"ref":"g1","keywords":["休克","重症","川崎病休克","kd_ss","血压","灌注","休克处理","危重","抢救"],"verifiedSource":"中国循证指南（2023）重症处理章节"},{"h":"巨噬细胞活化综合征（MAS）","anchor":"mas-mas","text":"川崎病并发 MAS 多见于年长儿，常在急性期后出现持续高热、肝脾肿大、淋巴结肿大、凝血异常、白细胞与血小板进行性下降。","points":["M subset MAS：中性粒细胞减少、血小板减少、纤维蛋白原升高","可累及心、肾、肝等多器官","治疗需个体化，必要时转 PICU"],"ref":"g1","keywords":["mas","巨噬细胞活化综合征","sMAS","并发症","高热不退","肝脾肿大","凝血","白细胞下降","血小板下降","多器官"],"verifiedSource":"中国循证指南（2023）MAS 处理章节"}]},{"id":"care","guide":"g3","title":"疾病管理与随访","keywords":["随访","管理","门诊","复查","疫苗","转诊","随访计划","预后"],"items":[{"h":"随访计划","anchor":"care-followup","text":"出院后应定期随访，复查血常规、CRP、肝肾功能、心电图与超声心动图，评估抗血小板治疗耐受性与远期冠脉情况。","points":["出院后 1 个月、3 个月、6 个月、1 年及此后每年复查","复查心脏超声（必要行运动负荷试验或冠脉 CT）","长期 ASA 者监测肝功能、血小板、听力、胃肠道症状","恢复期出现手足指趾脱皮属正常过程，不需特殊处理"],"ref":"g3","keywords":["随访","复查","出院后","多久复查","门诊","管理","监测指标","长期随访","康复","多久","时间表","复查项目"],"verifiedSource":"全科实践版指南（2025）疾病管理与随访"},{"h":"疫苗接种建议","anchor":"care-vaccine","text":"IVIG 后若 1 年内拟接种活疫苗（ MMR、水痘等），建议延后至 IVIG 后至少 11 个月；灭活疫苗通常无影响但建议病情稳定后进行。","points":["IVIG 后 11 个月内避免活疫苗","接种前确认冠脉状况稳定","儿童在康复期应避免剧烈运动 3-6 个月"],"ref":"g3","keywords":["疫苗","接种","免疫接种","MMR","水痘","活疫苗","灭活疫苗","11个月","延后","能不能打","多久能打","计划免疫","康复期","剧烈运动","限制","疫苗时间","注意事项","复查"],"verifiedSource":"全科实践版指南（2025）随访与疫苗建议"}]}],"safety":{"emergency":["精神萎靡、嗜睡、反应差","持续高热不退，或热退后再次发热","面色苍白、口唇发绀、呼吸急促、呻吟","血压下降、四肢厥冷、尿量减少","剧烈头痛、呕吐、意识改变","胸痛、心悸、活动后气促"],"note":"出现上述任一情况请立即就医。"}};
+
+</script>
+<script>
+/* ==== 检索引擎 ==== */
+/* ==========================================================
+   retrieval.js — 纯前端指南检索引擎（零依赖）
+   作用：即使 AI 服务完全不可用，也能基于 6 部指南做检索与定位
+
+   算法：BM25F（字段加权）+ 中文二元切分 + 双向同义词归一 + 意图词
+   字段权重：条目标题 3.0 / 条目关键词 2.0 / 章节标题 1.2 / 正文 1.0
+   ========================================================== */
+(function (global) {
+  'use strict';
+
+  /* ---------- 别名归一表（双向：BOTH directions） ----------
+     作用：让「丙种球蛋白」「免疫球蛋白」「静丙」都能召回 IVIG 条目，
+     反之输入 ivig 也能召回中文表述。 */
+  var ALIAS = {
+    /* IVIG */
+    'ivig': ['免疫球蛋白', '丙种球蛋白', '静丙', '免疫球'],
+    '免疫球蛋白': ['ivig', '丙种球蛋白', '静丙'],
+    '丙种球蛋白': ['ivig', '免疫球蛋白', '静丙'],
+    '静丙': ['ivig', '免疫球蛋白'],
+    '免疫球': ['ivig', '免疫球蛋白'],
+    /* ASA */
+    'asa': ['阿司匹林', '乙酰水杨酸', 'aspiretin'],
+    '阿司匹林': ['asa', '乙酰水杨酸'],
+    '乙酰水杨酸': ['asa', '阿司匹林'],
+    /* GC */
+    '激素': ['糖皮质激素', '甲泼尼龙', '泼尼松', '强的松', 'gc'],
+    '糖皮质激素': ['激素', '甲泼尼龙', 'gc'],
+    '甲泼尼龙': ['激素', '糖皮质激素'],
+    'gc': ['激素', '糖皮质激素'],
+    /* 冠脉 */
+    'caa': ['冠状动脉瘤', '冠脉瘤', '冠状动脉扩张'],
+    '冠状动脉瘤': ['caa', '冠脉瘤'],
+    '冠脉瘤': ['caa', '冠状动脉瘤'],
+    'cal': ['冠状动脉病变', '冠脉病变', 'caa'],
+    '冠状动脉病变': ['cal', 'caa'],
+    '冠脉病变': ['cal', 'caa'],
+    '冠脉': ['冠状动脉', 'caa'],
+    '冠状动脉': ['冠脉', 'caa'],
+    'z值': ['zscore', 'z score', 'caa'],
+    'zscore': ['z值', 'caa'],
+    /* 超声 */
+    '心超': ['超声心动图', '心脏超声', '超声'],
+    '心脏超声': ['超声心动图', '心超'],
+    '超声心动图': ['心超', '心脏超声'],
+    '超声': ['超声心动图', '心超'],
+    /* 重症 */
+    'kdss': ['休克', '川崎病休克综合征'],
+    '休克': ['kdss', '川崎病休克综合征'],
+    'mas': ['巨噬细胞活化综合征'],
+    '巨噬细胞活化综合征': ['mas'],
+    /* 高危评分 */
+    'kobayashi': ['小林', '高危评分', '评分'],
+    '高危评分': ['kobayashi', '小林', '评分'],
+    '小林': ['kobayashi', '高危评分'],
+    /* 症状别名 */
+    '发烧': ['发热'], '体温': ['发热'],
+    '眼睛红': ['结膜充血'], '结膜充血': ['眼睛红'],
+    '手肿': ['手足硬肿', '手足肿'], '手足肿': ['手肿', '手足硬肿'],
+    '脱皮': ['膜状脱皮', '指趾脱皮'], '杨梅舌': ['草莓舌'], '草莓舌': ['杨梅舌'],
+    '淋巴': ['淋巴结肿大'], '皮疹': ['出疹'], '疹子': ['皮疹'],
+    /* 意图/用法 */
+    '剂量': ['用量', '多少'], '用量': ['剂量'],
+    '疗程': ['吃多久', '用多久', '多久'],
+    '吃多久': ['疗程', '多久'], '用多久': ['疗程', '多久'],
+    '多久': ['疗程', '多长时间'], '多长时间': ['多久', '疗程'],
+    '什么时候': ['时机', '时间'], '何时': ['时机', '时间'],
+    '时机': ['什么时候', '时间'],
+    '怎么办': ['如何处理', '处理', '治疗'], '如何处理': ['怎么办'],
+    '怎么诊断': ['诊断标准', '诊断'], '如何诊断': ['诊断标准', '诊断'],
+    '鉴别': ['误诊', '区分'], '误诊': ['鉴别'],
+    '复查': ['随访', '回诊'], '随访': ['复查', '回诊'],
+    '疫苗': ['免疫接种', '接种'], '接种': ['疫苗'],
+    '严重吗': ['严重程度', '预后'], '预后': ['严重吗']
+  };
+
+  /* 停用词 */
+  var STOP = ['的', '了', '是', '在', '和', '与', '有', '会', '吗', '呢', '吧', '啊',
+    '请', '问', '一下', '这个', '那个', '可以', '需要', '我们', '一个', '现在',
+    '已经', '还是', '就是', '我', '你', '他'];
+
+  /* ---------- 中文二元切分 ---------- */
+  function tokenize(str) {
+    var tokens = [];
+    if (!str) return tokens;
+    var s = String(str).toLowerCase();
+
+    var en = s.match(/[a-z][a-z0-9+\-.]*|\d+(?:\.\d+)?/g);
+    if (en) en.forEach(function (w) { if (w.length > 1 || /\d/.test(w)) tokens.push(w); });
+
+    var cjk = s.match(/[\u4e00-\u9fa5]+/g) || [];
+    cjk.forEach(function (run) {
+      for (var i = 0; i < run.length; i++) {
+        tokens.push(run[i]);
+        if (i + 1 < run.length) tokens.push(run.slice(i, i + 2));
       }
     });
-  } catch (e) { console.error('Coze init failed:', e); }
-});
+    return tokens.filter(function (t) { return STOP.indexOf(t) === -1; });
+  }
+
+  /* ---------- 同义词双向扩展 ----------
+     输入词若在 ALIAS 中，追加其所有别名；反之若某别名的表里含该词，
+     也追加该别名（保证双向召回）。 */
+  function expandAliases(tokens) {
+    var set = {};
+    tokens.forEach(function (t) { set[t] = true; });
+
+    // 正向
+    tokens.forEach(function (t) {
+      (ALIAS[t] || []).forEach(function (a) { set[a] = true; });
+    });
+
+    // 反向：扫描 ALIAS，找出哪些别名指向当前 token
+    Object.keys(ALIAS).forEach(function (key) {
+      if (ALIAS[key].indexOf === undefined) return;
+      if (ALIAS[key].some(function (v) { return set[v]; })) set[key] = true;
+    });
+
+    return Object.keys(set);
+  }
+
+  /* ---------- 字段权重 ----------
+   keywords（人工标注的意图信号）权重最高，用于克服条目正文变长带来的
+   同词稀释问题——例如 asa-dose 与 cal-zscore 正文都含"冠脉瘤/CAA"，
+   靠 keywords 里的区分性意图词把正确条目拉到前面。 */
+  var W = { title: 3.2, keywords: 4.5, section: 1.0, body: 0.9 };
+  var K1 = 1.4, B = 0.72;
+
+  /* ---------- BM25F 索引 ---------- */
+  function buildIndex(kb) {
+    var docs = [];
+    var byAnchor = {};
+
+    kb.sections.forEach(function (sec) {
+      sec.items.forEach(function (it) {
+        var fields = {
+          title: [it.h || ''].join(' '),
+          keywords: (it.keywords || []).join(' ') + ' ' + (sec.keywords || []).join(' '),
+          section: sec.title || '',
+          body: [it.text || '', (it.points || []).join(' ')].join(' ')
+        };
+
+        var tokens = { title: [], keywords: [], section: [], body: [] };
+        Object.keys(fields).forEach(function (f) {
+          tokens[f] = tokenize(fields[f]).filter(function (t) { return STOP.indexOf(t) === -1; });
+        });
+
+        var weighted = []
+          .concat(tokens.title)
+          .concat(tokens.keywords)
+          .concat(tokens.section)
+          .concat(tokens.body);
+
+        docs.push({
+          id: it.anchor,
+          secId: sec.id,
+          secTitle: sec.title,
+          guideId: sec.guide,
+          h: it.h,
+          text: it.text || '',
+          points: it.points || [],
+          ref: it.ref,
+          tokens: tokens,
+          tf: {},
+          len: weighted.length
+        });
+
+        // tf 加权累计
+        var d = docs[docs.length - 1];
+        Object.keys(tokens).forEach(function (f) {
+          tokens[f].forEach(function (t) {
+            d.tf[t] = (d.tf[t] || 0) + W[f];
+          });
+        });
+
+        byAnchor[it.anchor] = docs.length - 1;
+      });
+    });
+
+    var df = {};
+    var totalLen = 0;
+    docs.forEach(function (d) {
+      Object.keys(d.tf).forEach(function (t) { df[t] = (df[t] || 0) + 1; });
+      totalLen += d.len;
+    });
+
+    return {
+      docs: docs,
+      byAnchor: byAnchor,
+      df: df,
+      N: docs.length,
+      avgLen: totalLen / docs.length || 1
+    };
+  }
+
+  /* ---------- 检索 ---------- */
+  function search(query, kb, limit) {
+    limit = limit || 5;
+    var idx = kb._idx;
+    if (!idx) return [];
+
+    var raw = tokenize(query);
+    if (!raw.length) return [];
+    var qTokens = expandAliases(raw);
+
+    var scored = idx.docs.map(function (d) {
+      var score = 0;
+      var strongMatched = 0;   // 命中长度≥2的词（有效信号）
+      var weakMatched = 0;     // 仅命中单字（噪声）
+
+      qTokens.forEach(function (t) {
+        var f = d.tf[t];
+        if (!f) return;
+        var n = idx.df[t] || 1;
+        var idf = Math.log(1 + (idx.N - n + 0.5) / (n + 0.5));
+        var norm = f * (K1 + 1) /
+          (f + K1 * (1 - B + B * d.len / idx.avgLen));
+        var s = idf * norm;
+
+        if (t.length >= 2) { s *= 1.45; strongMatched++; }
+        else { s *= 0.35; weakMatched++; }
+
+        score += s;
+      });
+
+      if (!strongMatched && !weakMatched) return { id: d.id, score: 0, doc: d };
+      // 只有单字命中 → 大幅降权，避免噪声条目窜到前面
+      if (!strongMatched) score *= 0.25;
+
+      // 覆盖率加成
+      score *= (strongMatched + weakMatched) / Math.min(qTokens.length, 12);
+      return { id: d.id, score: score, doc: d, strong: strongMatched };
+    });
+
+    return scored
+      .filter(function (s) { return s.score > 1.2; })   // 最低分阈值
+      .sort(function (a, b) { return b.score - a.score; })
+      .filter(function (s, i, arr) {
+        // 同一条目去重
+        return arr.findIndex(function (o) { return o.doc.id === s.doc.id; }) === i;
+      })
+      .slice(0, limit);
+  }
+
+  /* ---------- 急症信号检测 ---------- */
+  var URGENT_PATTERNS = [
+    { re: /休克|昏迷|意识不清|叫不醒|嗜睡|精神萎靡|反应差|抽搐|惊厥/, label: '意识/精神状态改变' },
+    { re: /呼吸困难|气促|发绀|口唇发绀|紫绀|呻吟|血氧|低氧/, label: '呼吸困难或发绀' },
+    { re: /胸痛|心悸|心衰|肺水肿|血压下降|血压低|四肢厥冷|花斑/, label: '循环/心脏受累表现' },
+    { re: /少尿|无尿|尿量减少|尿闭/, label: '尿量减少' },
+    { re: /剧烈头痛|喷射性呕吐|颈项强直|颈强直/, label: '颅内压增高表现' },
+    { re: /出血|瘀斑|皮下出血|牙龈出血/, label: '出血倾向' }
+  ];
+
+  function detectUrgent(text) {
+    var s = String(text || '');
+    var hits = [];
+    URGENT_PATTERNS.forEach(function (p) {
+      var m = s.match(p.re);
+      if (m) hits.push({ label: p.label, kw: m[0] });
+    });
+    return hits;
+  }
+
+  /* ---------- 组装回答（离线降级模式） ---------- */
+  function composeOfflineAnswer(query, kb) {
+    var hits = search(query, kb, 3);
+    var urgent = detectUrgent(query);
+    var sourceById = {};
+    kb.sources.forEach(function (s) { sourceById[s.id] = s; });
+
+    if (!hits.length) {
+      return {
+        text: '抱歉，在 6 部指南中没有检索到与该问题直接对应的条目。\n' +
+          '你可以尝试以下方式：\n' +
+          '· 换用更具体的医学词汇，例如「IVIG 剂量」「冠脉瘤 分级」「激素 什么时候用」\n' +
+          '· 用左侧搜索框直接检索指南全文\n' +
+          '· 就诊时把具体问题记录下来，交给主治医师判断',
+        citations: [],
+        urgent: urgent,
+        degraded: true
+      };
+    }
+
+    var lines = [];
+    var cites = [];
+
+    if (urgent.length) {
+      lines.push('请优先处理以下情况');
+      urgent.forEach(function (u) {
+        lines.push('· 检测到「' + u.kw + '」（' + u.label + '）——属于川崎病可能出现的重症信号，请立即联系医生或就近急诊');
+      });
+      lines.push('');
+    }
+
+    lines.push('根据站内 6 部指南/共识，检索到以下相关内容：');
+
+    hits.forEach(function (h, i) {
+      var d = h.doc;
+      var src = sourceById[d.ref] || sourceById[d.guideId];
+      lines.push('');
+      lines.push('**' + (i + 1) + '. ' + d.secTitle + ' — ' + d.h + '**');
+      if (d.text) lines.push(d.text);
+      if (d.points && d.points.length) {
+        d.points.forEach(function (p) { lines.push('· ' + p); });
+      }
+      if (src) {
+        lines.push('（依据：' + src.title + '，' + src.journal + '，' + src.year + '）');
+        cites.push({
+          anchor: d.id,
+          guideId: d.ref || d.guideId,
+          label: src.shortTitle + ' · ' + d.secTitle
+        });
+      }
+    });
+
+    lines.push('');
+    lines.push('以上为指南原文条目摘录，**不能替代医生面诊诊断**。请携患儿及时就诊，由儿科/心血管专科医师结合查体、超声心动图与实验室结果决定诊疗方案。');
+
+    return {
+      text: lines.join('\n'),
+      citations: cites,
+      urgent: urgent,
+      degraded: true
+    };
+  }
+
+  /* ---------- 高亮与转义 ---------- */
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function escapeRegExp(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+  function highlight(text, query) {
+    var safe = escapeHtml(text);
+    if (!query) return safe;
+    var terms = tokenize(query).filter(function (t) { return t.length >= 2; });
+    // 长词优先替换，避免短词先命中导致长词匹配不到
+    terms.sort(function (a, b) { return b.length - a.length; });
+    var uniq = [];
+    terms.forEach(function (t) {
+      var et = escapeHtml(t);
+      if (et && uniq.indexOf(et) === -1) uniq.push(et);
+    });
+    if (!uniq.length) return safe;
+    try {
+      return safe.replace(new RegExp('(' + uniq.map(escapeRegExp).join('|') + ')', 'gi'), '<mark>$1</mark>');
+    } catch (e) {
+      return safe;
+    }
+  }
+
+  /* ---------- 对外 API ---------- */
+  global.KDRetrieval = {
+    tokenize: tokenize,
+    expandAliases: expandAliases,
+    search: function (query, kb, limit) {
+      if (!kb._idx) kb._idx = buildIndex(kb);
+      return search(query, kb, limit);
+    },
+    buildIndex: buildIndex,
+    detectUrgent: detectUrgent,
+    composeOfflineAnswer: composeOfflineAnswer,
+    highlight: highlight,
+    escapeHtml: escapeHtml
+  };
+
+})(window);
+</script>
+<script>
+/* ==== 主逻辑 ==== */
+/* ==========================================================
+   app.js — KDGUIDE 2.0 主逻辑
+   职责：知识库渲染 / 检索定位 / 对话编排 / AI 降级 / 免责声明交互
+   ========================================================== */
+(function () {
+  'use strict';
+
+  var R = window.KDRetrieval;
+  var CONFIG = {
+    /* AI 后端地址：留空则自动进入纯离线检索模式。
+       支持两种形态：
+         ① 相对路径 '/api/chat'  → 由本地 server.js 或 Cloudflare Worker 转发
+         ② 绝对地址 https://...   → Cloudflare Worker
+       API Key 只存在于服务端环境变量，绝不写在前端。 */
+    apiEndpoint: window.KD_API_ENDPOINT || '/api',
+    apiTimeout: 30000,
+    /* 连续失败多少次后熔断，直接走离线 */
+    failThreshold: 2,
+    historyLimit: 6,
+    /* 输入长度上限（与后端一致，避免白跑一趟） */
+    maxInput: 500,
+    /* 流式输出：优先 SSE，失败自动退回一次性解析 */
+    preferStream: true
+  };
+
+  var state = {
+    kb: null,
+    openGuide: null,
+    failCount: 0,
+    aiDown: false,
+    busy: false,
+    history: [],
+    lastQuery: ''
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var el = {
+    guideList: $('guide-list'), guideCount: $('guide-count'), guideFooter: $('guide-footer'),
+    search: $('kb-search'), searchClear: $('search-clear'), searchHint: $('search-hint'),
+    chatArea: $('chat-area'), welcome: $('welcome'), suggestGrid: $('suggest-grid'),
+    input: $('input'), send: $('send'), charCount: $('char-count'),
+    statusDot: $('status-dot'), statusText: $('status-text'), btnAgain: $('btn-again'),
+    banner: $('fallback-banner'), fbTitle: $('fb-title'), fbText: $('fb-text'), fbLinks: $('fb-links'),
+    btnGuide: $('btn-guide'), guidePanel: $('guide-panel'), scrim: $('scrim'),
+    siteFooter: document.querySelector('.site-footer'),
+    hlFlash: $('hl-flash'),
+    fabDisc: $('fab-disc'), discSheet: $('disc-sheet'), discClose: $('disc-close')
+  };
+
+  /* ---------------- 启动 ---------------- */
+
+  /* 知识库三级加载：内联数据 → fetch 远程 → 降级提示
+     问题背景：某些预览/分发环境只提供单个 index.html（无 data/ 目录），
+     此时 fetch('data/kb.json') 会 404，导致整个知识库不可用。
+     故把 KB 打包进 assets/kb-data.js（window.KD_KB），内联优先、fetch 兜底。 */
+  function loadKB() {
+    // 1) 内联数据（构建脚本生成，单文件分发可用）
+    if (window.KD_KB && window.KD_KB.sources && window.KD_KB.sections) {
+      return Promise.resolve(window.KD_KB);
+    }
+    // 2) 远程 JSON（可独立更新 KB，不需重新打包）
+    return fetch('data/kb.json', { cache: 'no-cache' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('kb.json HTTP ' + r.status);
+        return r.json();
+      });
+  }
+
+  function init() {
+    loadKB()
+      .then(function (kb) {
+        state.kb = kb;
+        R.buildIndex(kb);           // 预建索引，离线检索零延迟
+        renderGuides();
+        renderSuggestions();
+        bindEvents();
+        probeAI();
+      })
+      .catch(function (err) {
+        console.error('[KDGUIDE] 知识库加载失败', err);
+        var is404 = /404/.test(err && err.message || '');
+        el.guideList.innerHTML =
+          '<div class="guide-empty">' +
+          '<strong>知识库暂不可用</strong><br><br>' +
+          (is404
+            ? '未能加载指南数据（kb.json 找不到）。<br>若为单文件预览，请先运行 <code>node build-kb.js</code> 生成内联数据。'
+            : '请检查网络后刷新页面重试。') +
+          '<br><br><small>（' + R.escapeHtml(err.message || '') + '）</small></div>';
+        el.guideFooter.textContent = '知识库不可用';
+        el.statusDot.className = 'dot err';
+        el.statusText.textContent = '知识库不可用';
+        // 聊天区仍可用：会走离线兜底提示
+        renderSuggestions();
+        bindEvents();
+      });
+  }
+
+  /* ---------------- 知识库渲染 ---------------- */
+  function renderGuides(filter) {
+    var kb = state.kb;
+    var q = (filter || '').trim();
+
+    // 有查询时：跨全部章节做检索，按命中分组展示
+    if (q) {
+      var hits = R.search(q, kb, 24);
+      el.searchHint.hidden = false;
+      if (!hits.length) {
+        el.searchHint.innerHTML = '未找到与 <b>' + R.escapeHtml(q) + '</b> 匹配的内容，试试「IVIG」「冠脉瘤」「发热」';
+        el.guideList.innerHTML = '<div class="guide-empty">没有匹配的指南条目</div>';
+        el.guideFooter.textContent = '搜索无结果';
+        return;
+      }
+      el.searchHint.innerHTML = '找到 <b>' + hits.length + '</b> 个相关条目';
+      renderSearchResults(hits);
+      return;
+    }
+
+    el.searchHint.hidden = true;
+    // 无查询：按指南分组展示
+    var html = kb.sources.map(function (s) {
+      var secs = kb.sections.filter(function (sec) { return sec.guide === s.id; });
+      var secHtml = secs.map(function (sec) {
+        return '<div class="sec-title">' + R.escapeHtml(sec.title) + '</div>' +
+          sec.items.map(function (it) { return renderItem(it, s); }).join('');
+      }).join('');
+
+      return '<article class="guide-card' + (state.openGuide === s.id ? ' open' : '') + '" data-guide="' + s.id + '">' +
+        '<div class="guide-card-hd" role="button" tabindex="0" aria-expanded="' +
+          (state.openGuide === s.id) + '" aria-controls="body-' + s.id + '">' +
+          '<span class="guide-type ' + s.typeClass + '">' + R.escapeHtml(s.type) + '</span>' +
+          '<div class="guide-card-main">' +
+            '<div class="guide-title">' + R.escapeHtml(s.title) + '</div>' +
+            '<div class="guide-meta">' + R.escapeHtml(s.authors) + ' · ' + R.escapeHtml(s.journal) + '</div>' +
+            '<span class="guide-year">' + R.escapeHtml(s.year) + '年</span>' +
+          '</div>' +
+          '<span class="guide-arrow" aria-hidden="true">▶</span>' +
+        '</div>' +
+        '<div class="guide-body" id="body-' + s.id + '">' +
+          '<p class="guide-summary"><strong>核心内容：</strong>' + R.escapeHtml(s.summary) + '</p>' +
+          '<div class="guide-hl">' + s.highlights.map(function (h) {
+            return '<span class="hl-tag">' + R.escapeHtml(h) + '</span>';
+          }).join('') + '</div>' +
+          '<p class="guide-summary" style="margin-top:0"><strong>证据类型：</strong>' + R.escapeHtml(s.evidence) + '</p>' +
+          secHtml +
+        '</div>' +
+      '</article>';
+    }).join('');
+
+    el.guideList.innerHTML = html;
+    el.guideFooter.textContent = '共 ' + kb.sources.length + ' 部指南 · 点击卡片展开';
+  }
+
+  function renderItem(it, src) {
+    return '<div class="kb-item" id="kb-' + it.anchor + '" data-anchor="' + it.anchor + '">' +
+      '<div class="kb-item-h">' + R.escapeHtml(it.h) +
+        '<span class="kb-anchor">#' + R.escapeHtml(it.anchor) + '</span></div>' +
+      (it.text ? '<p>' + R.escapeHtml(it.text) + '</p>' : '') +
+      (it.points && it.points.length ? '<ul class="kb-points">' +
+        it.points.map(function (p) { return '<li>' + R.escapeHtml(p) + '</li>'; }).join('') +
+        '</ul>' : '') +
+      (it.editorialNote ? '<div class="kb-editorial">' +
+        '<span class="kb-ed-tag">校正说明</span>' + R.escapeHtml(it.editorialNote) + '</div>' : '') +
+      '<div class="kb-src">依据：' +
+        '<a href="#" data-jump="' + (it.ref || src.id) + '">' +
+          R.escapeHtml(src ? src.shortTitle : it.ref) + '</a>' +
+        ' · ' + R.escapeHtml(src ? src.journal + ' ' + src.year : '') +
+        (it.verifiedSource ? ' · 原文位置：' + R.escapeHtml(it.verifiedSource) : '') +
+      '</div>' +
+    '</div>';
+  }
+
+  /* ---------- 检索结果的原文出处 ---------- */
+  function kbSrcLoc(doc) {
+    if (!doc) return '';
+    if (doc.verifiedSource) return doc.verifiedSource;
+    // 从知识库原始条目里回查（检索索引未保留该字段时兜底）
+    var kb = state.kb;
+    if (!kb) return '';
+    for (var i = 0; i < kb.sections.length; i++) {
+      var items = kb.sections[i].items;
+      for (var j = 0; j < items.length; j++) {
+        if (items[j].anchor === doc.id) return items[j].verifiedSource || '';
+      }
+    }
+    return '';
+  }
+
+  function renderSearchResults(hits) {
+    var kb = state.kb;
+    var byGuide = {};
+    hits.forEach(function (h) {
+      var gid = h.doc.ref || h.doc.guideId;
+      if (!byGuide[gid]) byGuide[gid] = [];
+      byGuide[gid].push(h);
+    });
+
+    var html = '';
+    kb.sources.forEach(function (s) {
+      var group = byGuide[s.id];
+      if (!group || !group.length) return;
+      html += '<div class="sec-title">' + R.escapeHtml(s.title) + '</div>';
+      group.forEach(function (h) {
+        html += '<div class="kb-item" id="kb-' + h.doc.id + '" data-anchor="' + h.doc.id + '">' +
+          '<div class="kb-item-h">' + R.escapeHtml(h.doc.h) + '</div>' +
+          '<p>' + R.highlight(h.doc.text, el.search.value) + '</p>' +
+          (h.doc.points && h.doc.points.length ? '<ul class="kb-points">' +
+            h.doc.points.map(function (p) { return '<li>' + R.highlight(p, el.search.value) + '</li>'; }).join('') +
+            '</ul>' : '') +
+          '<div class="kb-src">依据：<a href="#" data-jump="' + s.id + '">' + R.escapeHtml(s.shortTitle) + '</a>' +
+            ' · ' + R.escapeHtml(s.journal + ' ' + s.year) +
+            (kbSrcLoc(h.doc) ? ' · 原文位置：' + R.escapeHtml(kbSrcLoc(h.doc)) : '') + '</div>' +
+        '</div>';
+      });
+    });
+
+    el.guideList.innerHTML = html;
+    el.guideFooter.textContent = '共 ' + hits.length + ' 条命中结果';
+  }
+
+  /* ---------------- 建议问题 ---------------- */
+  var SUGGESTIONS = [
+    '孩子发热5天符合川崎病诊断标准吗？',
+    'IVIG 用量和输注时间怎么定？',
+    'IVIG 无反应型 KD 怎么处理？',
+    '冠状动脉瘤 CAA 怎么分级？',
+    '阿司匹林急性期和恢复期剂量分别是多少？',
+    '什么情况下用糖皮质激素？',
+    '不完全川崎病超声要查什么？',
+    '出院后多久复查一次？'
+  ];
+
+  function renderSuggestions() {
+    var grid = el.suggestGrid || $('suggest-grid');
+    if (!grid) return;
+    grid.innerHTML = SUGGESTIONS.map(function (q) {
+      return '<button class="suggest-btn" type="button">' + R.escapeHtml(q) + '</button>';
+    }).join('');
+    bindSuggest();
+  }
+
+  /* ---------------- 事件绑定 ---------------- */
+  function bindEvents() {
+    // 指南卡片展开 / 折叠
+    el.guideList.addEventListener('click', function (e) {
+      var jump = e.target.closest('[data-jump]');
+      if (jump) {
+        e.preventDefault();
+        openGuide(jump.getAttribute('data-jump'), true);
+        return;
+      }
+      var hd = e.target.closest('.guide-card-hd');
+      if (!hd) return;
+      var card = hd.closest('.guide-card');
+      var gid = card.getAttribute('data-guide');
+      openGuide(gid, !card.classList.contains('open'));
+    });
+
+    // 键盘可达性：Enter / Space 展开卡片
+    el.guideList.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      var hd = e.target.closest('.guide-card-hd');
+      if (!hd) return;
+      e.preventDefault();
+      hd.click();
+    });
+
+    // 检索
+    var debounce;
+    el.search.addEventListener('input', function () {
+      clearTimeout(debounce);
+      var v = el.search.value;
+      el.searchClear.hidden = !v;
+      debounce = setTimeout(function () { renderGuides(v); }, 220);
+    });
+
+    el.searchClear.addEventListener('click', function () {
+      el.search.value = '';
+      el.searchClear.hidden = true;
+      renderGuides('');
+      el.search.focus();
+    });
+
+    // 移动端抽屉
+    el.btnGuide.addEventListener('click', function () {
+      var open = el.guidePanel.classList.toggle('open');
+      el.btnGuide.setAttribute('aria-expanded', String(open));
+      el.scrim.hidden = !open;
+    });
+    el.scrim.addEventListener('click', closeDrawer);
+
+    // 输入框
+    el.input.addEventListener('input', autoGrow);
+    el.input.addEventListener('keydown', function (e) {
+      // Enter 发送，Shift+Enter 换行；IME 组字期间不响应
+      if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+        e.preventDefault();
+        send();
+      }
+    });
+    el.send.addEventListener('click', send);
+
+    // 清空会话
+    var btnClear = $('btn-clear');
+    if (btnClear) btnClear.addEventListener('click', clearChat);
+
+    // 重试
+    el.btnAgain.addEventListener('click', function () {
+      state.failCount = 0;
+      el.btnAgain.hidden = true;
+      probeAI(true);
+    });
+
+    // 移动端免责弹层：由 CSS 控制显隐（见 style.css），此处只负责点击行为
+    el.fabDisc.addEventListener('click', function () { el.discSheet.hidden = false; });
+    el.discClose.addEventListener('click', function () { el.discSheet.hidden = true; });
+    el.discSheet.addEventListener('click', function (e) {
+      if (e.target === el.discSheet) el.discSheet.hidden = true;
+    });
+
+    // 移动端点击页脚展开免责声明全文
+    el.siteFooter.addEventListener('click', function () {
+      el.siteFooter.classList.toggle('expanded');
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        closeDrawer();
+        el.discSheet.hidden = true;
+      }
+    });
+
+    // 视口变化时同步抽屉状态
+    window.addEventListener('resize', debounceLayout);
+  }
+
+  function closeDrawer() {
+    el.guidePanel.classList.remove('open');
+    el.btnGuide.setAttribute('aria-expanded', 'false');
+    el.scrim.hidden = true;
+  }
+
+  function debounceLayout() {
+    var t;
+    window.addEventListener('resize', function () {
+      clearTimeout(t);
+      t = setTimeout(function () {
+        if (window.innerWidth > 768) closeDrawer();
+      }, 150);
+    });
+  }
+
+  function openGuide(gid, expand) {
+    state.openGuide = expand ? gid : null;
+    // 若当前在搜索视图，先退出搜索
+    if (el.search.value) {
+      el.search.value = '';
+      el.searchClear.hidden = true;
+    }
+    renderGuides('');
+    var card = document.querySelector('.guide-card[data-guide="' + gid + '"]');
+    if (card && expand && card.scrollIntoView) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function autoGrow() {
+    var ta = el.input;
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(ta.scrollHeight, 110) + 'px';
+    var len = ta.value.length;
+    var over = len > CONFIG.maxInput;
+    var near = len > CONFIG.maxInput * 0.9;
+    el.charCount.textContent = over ? len + '（超出 ' + (len - CONFIG.maxInput) + '）' : len + '/' + CONFIG.maxInput;
+    el.charCount.classList.toggle('warn', near);
+    // 发送按钮：空内容或超长均禁用，但超长时给出文字提示而非静默截断
+    el.send.disabled = !ta.value.trim() || over || state.busy;
+    // 超长时提示（节流 1.2s，避免每次按键都重置定时器）
+    if (over) {
+      var now = Date.now();
+      if (!flashInputError._last || now - flashInputError._last > 1200) {
+        flashInputError._last = now;
+        flashInputError('内容超长（' + len + '/' + CONFIG.maxInput + ' 字），请精简后再发送');
+      }
+    }
+  }
+
+  /* ---------------- AI 服务探测 ---------------- */
+  function probeAI(force) {
+    if (!CONFIG.apiEndpoint) {
+      enableOfflineMode('未配置 AI 服务地址');
+      return;
+    }
+    if (state.busy) return;
+    state.busy = true;
+    setStatus('load', '正在连接问答服务…');
+
+    var ctrl = new AbortController();
+    var timer = setTimeout(function () { ctrl.abort(); }, 8000);
+
+    fetch(CONFIG.apiEndpoint + '/health', { signal: ctrl.signal })
+      .then(function (r) {
+        clearTimeout(timer);
+        if (!r.ok) throw new Error('health ' + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        // 后端在线 ≠ AI 可用：必须看 ai 字段，否则未配 Key 时会误报"已就绪"
+        if (data && data.ai === false) {
+          enableOfflineMode(data.message || '服务端未配置模型密钥');
+          return;
+        }
+        state.aiDown = false;
+        state.failCount = 0;
+        setStatus('ok', 'AI 问答已就绪 · 基于 6 部指南');
+        el.banner.hidden = true;
+        el.btnAgain.hidden = true;
+        if (data && data.model) {
+          console.log('[KDGUIDE] AI 后端就绪，模型：' + data.model);
+        }
+      })
+      .catch(function (err) {
+        clearTimeout(timer);
+        console.warn('[KDGUIDE] AI 探测失败（将进入离线模式）', err);
+        var why = err.name === 'AbortError' ? '连接超时' :
+          (/Failed to fetch|NetworkError/i.test(err.message || '') ? '未检测到本地服务' : '服务无响应');
+        enableOfflineMode(why);
+      })
+      .finally(function () {
+        state.busy = false;
+        autoGrow();
+      });
+  }
+
+  /* ---------------- 降级：离线检索模式 ---------------- */
+  function enableOfflineMode(reason) {
+    state.aiDown = true;
+    // 离线检索是正常降级，不是故障：用中性色而非红色错误点
+    setStatus('off', '离线检索模式 · 指南功能完整可用');
+    el.banner.hidden = false;
+    el.fbTitle.textContent = 'AI 问答服务暂不可用' + (reason ? '（' + reason + '）' : '');
+    el.fbText.textContent = '已自动切换为「离线指南检索」模式：所有指南内容照常可读、可搜索；' +
+      '问答将直接摘录指南原文条目（无 AI 生成），依然可一键定位到出处。';
+    el.fbLinks.innerHTML =
+      '<a href="#" id="fb-open-guide">打开指南知识库</a>' +
+      '<a href="#" id="fb-retry">重试连接</a>';
+    $('fb-open-guide').addEventListener('click', function (e) {
+      e.preventDefault();
+      el.banner.hidden = true;
+      if (window.innerWidth <= 768) {
+        el.guidePanel.classList.add('open');
+        el.scrim.hidden = false;
+      } else {
+        el.search.focus();
+      }
+    });
+    $('fb-retry').addEventListener('click', function () {
+      el.banner.hidden = true;
+      probeAI(true);
+    });
+    el.btnAgain.hidden = false;
+  }
+
+  function setStatus(cls, text) {
+    el.statusDot.className = 'dot ' + cls;
+    el.statusText.textContent = text;
+  }
+
+  /* ---------------- 对话 ---------------- */
+
+  /* 输入校验：空输入 / 超长 分别给出明确提示 */
+  function validateInput() {
+    var raw = el.input.value;
+    var q = raw.trim();
+    if (!q) return { ok: false, reason: 'empty' };
+    if (raw.length > CONFIG.maxInput) {
+      return { ok: false, reason: 'tooLong', len: raw.length };
+    }
+    return { ok: true, value: q };
+  }
+
+  function flashInputError(msg) {
+    // 注意：DOM 里该元素只有 class，需按 class 查询
+    var tip = $('composer-tip') || document.querySelector('.composer-tip');
+    if (!tip) return;
+    var old = tip.textContent;
+    tip.textContent = msg;
+    tip.classList.add('warn');
+    clearTimeout(flashInputError._t);
+    flashInputError._t = setTimeout(function () {
+      tip.textContent = old;
+      tip.classList.remove('warn');
+    }, 2600);
+  }
+
+  function send() {
+    var v = validateInput();
+    if (!v.ok) {
+      if (v.reason === 'tooLong') {
+        flashInputError('内容超长（' + v.len + '/' + CONFIG.maxInput + ' 字），请精简后再发送');
+      } else {
+        flashInputError('请先输入您的问题');
+      }
+      el.input.focus();
+      return;
+    }
+    if (state.busy) return;
+
+    var q = v.value;
+    state.busy = true;
+    el.send.disabled = true;
+    hideWelcome();
+
+    addUserMsg(q);
+    el.input.value = '';
+    autoGrow();
+
+    state.lastQuery = q;
+
+    if (state.aiDown) {
+      // 离线模式：短暂延迟模拟思考，直接给指南原文摘录
+      var thinking = addThinkingMsg();
+      setTimeout(function () {
+        thinking.remove();
+        showAIMsg(R.composeOfflineAnswer(q, state.kb), true);
+        finish();
+      }, 320);
+      return;
+    }
+
+    // 先展示"正在思考"，直到首个流式分片到达才替换为内容节点，
+    // 否则首包延迟期间用户会看到完全空白的区域。
+    var pendingNode = addThinkingMsg('正在检索指南并生成回答…');
+    callAI(q, pendingNode);
+  }
+
+  /* ---------- 流式回复 ----------
+     优先请求 text/event-stream，逐块渲染 delta；
+     若后端不支持流式（返回 JSON），自动回退一次性解析。 */
+  function callAI(q, pendingNode) {
+    var ctrl = new AbortController();
+    var timedOut = false;
+    var timer = setTimeout(function () {
+      timedOut = true;
+      ctrl.abort();
+    }, CONFIG.apiTimeout);
+
+    var payload = {
+      message: q,
+      history: state.history.slice(-CONFIG.historyLimit),
+      stream: CONFIG.preferStream
+    };
+
+    fetch(CONFIG.apiEndpoint + '/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'text/event-stream, application/json' },
+      signal: ctrl.signal,
+      body: JSON.stringify(payload)
+    })
+      .then(function (r) {
+        clearTimeout(timer);
+        if (r.status === 429) throw Object.assign(new Error('rate'), { code: 'RATE' });
+        if (r.status === 413) throw Object.assign(new Error('too long'), { code: 'TOO_LONG' });
+        if (r.status === 401 || r.status === 403) {
+          throw Object.assign(new Error('unauthorized'), { code: 'AUTH' });
+        }
+        if (!r.ok) throw Object.assign(new Error('HTTP ' + r.status), { code: 'HTTP' });
+
+        var ct = (r.headers.get('content-type') || '');
+        if (CONFIG.preferStream && ct.indexOf('text/event-stream') >= 0 && r.body) {
+          return readStream(r, q, pendingNode);
+        }
+        return r.json().then(function (data) {
+          if (pendingNode && pendingNode.parentNode) pendingNode.remove();
+          showAIMsg({ text: data.answer || '', citations: data.citations || [], urgent: data.urgent || [] });
+          pushHistory(q, data.answer || '');
+          markAIUp();
+        });
+      })
+      .catch(function (err) {
+        clearTimeout(timer);
+        // 失败时移除"正在思考"占位，避免残留
+        if (pendingNode && pendingNode.parentNode) pendingNode.remove();
+        handleAIError(err, q, timedOut);
+      });
+  }
+
+  /* 读取 SSE 流并实时渲染 */
+  function readStream(resp, q, pendingNode) {
+    var reader = resp.body.getReader();
+    var decoder = new TextDecoder('utf-8');
+    var buffer = '';
+    var full = '';
+    // 直接复用调用方已插入的"正在思考"节点
+    var node = pendingNode || null;
+    var citations = [];
+    var urgent = [];
+
+    if (typeof ReadableStream !== 'undefined') {
+      el.send.disabled = true;
+    }
+
+    return new Promise(function (resolve, reject) {
+      // 注意：ensureNode 每次都必须返回 .stream-text 元素本身，
+      // 不能返回外层 div，否则后续 delta 会写到错误节点上。
+      var streamEl = null;
+      function ensureNode() {
+        if (streamEl) return streamEl;
+        if (node) {
+          // 复用已插入的"正在思考"节点，就地转为内容节点
+          var bubble = node.querySelector('.bubble');
+          if (bubble) {
+            bubble.innerHTML = '<p class="stream-text"></p>';
+            streamEl = node.querySelector('.stream-text');
+            return streamEl;
+          }
+        }
+        //兜底：极端情况下节点不存在则新建
+        node = document.createElement('div');
+        node.className = 'msg ai';
+        node.innerHTML = '<div class="msg-avatar" aria-hidden="true">KD</div>' +
+          '<div class="bubble"><p class="stream-text"></p></div>';
+        el.chatArea.appendChild(node);
+        streamEl = node.querySelector('.stream-text');
+        return streamEl;
+      }
+
+      function pump() {
+        reader.read().then(function (res) {
+          if (res.done) {
+            // 结束：补齐引用、危重信号与免责
+            var box = node && node.querySelector('.bubble');
+            if (box) {
+              var urgentHtml = (urgent && urgent.length)
+                ? '<div class="urgent"><strong>⚠ 检测到可能的重症信号，建议立即就医</strong>' +
+                  urgent.map(function (u) { return '· ' + R.escapeHtml(u.kw); }).join('<br>') +
+                  '</div>'
+                : '';
+              var tail = document.createElement('div');
+              tail.innerHTML = urgentHtml + renderExtras(citations, null, false) +
+                '<div style="font-size:10.5px;color:#BBB;margin-top:8px;line-height:1.5">' +
+                '仅供科普参考，不能替代医生诊断</div>';
+              box.appendChild(tail);
+              bindCitations(node);
+            }
+            pushHistory(q, full);
+            markAIUp();
+            finish();
+            resolve();
+            return;
+          }
+          buffer += decoder.decode(res.value, { stream: true });
+          var parts = buffer.split('\n\n');
+          buffer = parts.pop() || '';
+
+          parts.forEach(function (chunk) {
+            var dataLines = chunk.split('\n')
+              .filter(function (l) { return l.indexOf('data:') === 0; })
+              .map(function (l) { return l.slice(5).trim(); });
+            if (!dataLines.length) return;
+            var payloadStr = dataLines.join('');
+            if (!payloadStr || payloadStr === '[DONE]') return;
+            var ev;
+            try { ev = JSON.parse(payloadStr); } catch (e) { return; }
+
+            if (ev.citations) citations = ev.citations;
+            if (ev.urgent) urgent = ev.urgent;
+
+            if (ev.delta) {
+              full += ev.delta;
+              var p = ensureNode();
+              p.innerHTML = mdBlock(full);
+              scrollBottom();
+            }
+            if (ev.done) { /* 可选结束标记 */ }
+          });
+          pump();
+        }).catch(function (e) {
+          // 中途断流：若已有内容则保留，否则报错
+          if (full) { finish(); resolve(); }
+          else reject(e);
+        });
+      }
+      pump();
+    });
+  }
+
+  /* 引用/免责/降级徽标的统一渲染 */
+  function renderExtras(citations, urgent, degraded) {
+    var html = '';
+    if (urgent && urgent.length) {
+      html += '<div class="urgent"><strong>⚠ 检测到可能的重症信号，建议立即就医</strong>' +
+        urgent.map(function (u) {
+          return '· ' + R.escapeHtml(u.kw) + '（' + R.escapeHtml(u.label) + '）';
+        }).join('<br>') +
+        '<br>以上表现需由医生立即评估，请勿仅依赖网络问答。</div>';
+    }
+    if (degraded) {
+      html += '<div class="degraded-tag">📖 离线检索模式：以下为指南原文摘录，未经 AI 生成。</div>';
+    }
+    if (citations && citations.length) {
+      html += '<div class="cites">' + citations.map(function (c) {
+        return '<button class="cite-btn" type="button" data-anchor="' + R.escapeHtml(c.anchor) +
+          '" data-guide="' + R.escapeHtml(c.guideId || '') + '">' +
+          R.escapeHtml(c.label || '指南原文') + '</button>';
+      }).join('') + '</div>';
+    }
+    return html;
+  }
+
+  function showAIMsg(ans, degraded, isError) {
+    var srcById = {};
+    if (state.kb) state.kb.sources.forEach(function (s) { srcById[s.id] = s; });
+
+    var html = '<div class="msg-avatar" aria-hidden="true">KD</div><div class="bubble">' +
+      renderExtras(ans.citations, ans.urgent, degraded) +
+      mdBlock(ans.text || '（无内容）') +
+      '<div style="font-size:10.5px;color:#BBB;margin-top:8px;line-height:1.5">' +
+      '仅供科普参考，不能替代医生诊断</div></div>';
+
+    var d = document.createElement('div');
+    d.className = 'msg ai';
+    d.innerHTML = html;
+    el.chatArea.appendChild(d);
+    bindCitations(d);
+    scrollBottom();
+    return d;
+  }
+
+  function bindCitations(scope) {
+    scope.querySelectorAll('.cite-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        jumpToAnchor(btn.getAttribute('data-anchor'), btn.getAttribute('data-guide'));
+      });
+    });
+  }
+
+  function pushHistory(q, answer) {
+    state.history.push({ role: 'user', content: q });
+    state.history.push({ role: 'assistant', content: answer });
+  }
+
+  function markAIUp() {
+    state.failCount = 0;
+    if (state.aiDown) {
+      state.aiDown = false;
+      setStatus('ok', 'AI 问答已就绪 · 基于 6 部指南');
+      el.banner.hidden = true;
+    }
+  }
+
+  /* 错误分类：不同原因给不同文案，并区分"是否仍可用" */
+  function handleAIError(err, q, timedOut) {
+    console.warn('[KDGUIDE] AI 调用失败', err);
+    var code = err.code || '';
+    var reason, shortMsg;
+
+    if (timedOut || err.name === 'AbortError') {
+      reason = '请求超时';
+      shortMsg = '⏱ 响应超时（超过 ' + (CONFIG.apiTimeout / 1000) + ' 秒）。可能是网络较慢或服务繁忙，请重试。';
+    } else if (code === 'RATE') {
+      reason = '请求过于频繁';
+      shortMsg = '⚠ 请求过于频繁，请稍候再试（已自动切换为离线检索）。';
+    } else if (code === 'AUTH') {
+      reason = '服务未授权';
+      shortMsg = '🔑 AI 服务鉴权失败，请检查服务端 API Key 配置。';
+    } else if (code === 'TOO_LONG') {
+      reason = '内容超长';
+      shortMsg = '📏 提交内容超长，请精简后重试。';
+    } else if (code === 'NETWORK') {
+      reason = '网络异常';
+      shortMsg = '📡 网络连接失败，请检查网络后重试。';
+    } else {
+      reason = err.message || '请求失败';
+      shortMsg = '⚠ AI 服务暂时不可用，已为你切换为离线指南检索。';
+    }
+
+    state.failCount++;
+    if (state.failCount >= CONFIG.failThreshold) {
+      enableOfflineMode(reason);
+    }
+
+    // 本次仍给出可用答案（指南原文摘录），并在气泡内说明原因
+    var node = showAIMsg(R.composeOfflineAnswer(q, state.kb), true, true);
+    var tip = document.createElement('div');
+    tip.className = 'inline-warn';
+    tip.textContent = shortMsg;
+    var bubble = node.querySelector('.bubble');
+    if (bubble) bubble.insertBefore(tip, bubble.firstChild);
+    finish();
+  }
+
+  function finish() {
+    state.busy = false;
+    autoGrow();
+    el.input.focus();
+  }
+
+  function hideWelcome() {
+    if (el.welcome && el.welcome.parentNode) el.welcome.remove();
+  }
+
+  function addUserMsg(text) {
+    var d = document.createElement('div');
+    d.className = 'msg user';
+    d.innerHTML = '<div class="msg-avatar" aria-hidden="true">我</div>' +
+      '<div class="bubble">' + mdInline(text) + '</div>';
+    el.chatArea.appendChild(d);
+    scrollBottom();
+  }
+
+  function addThinkingMsg(text) {
+    var d = document.createElement('div');
+    d.className = 'msg ai';
+    d.innerHTML = '<div class="msg-avatar" aria-hidden="true">KD</div>' +
+      '<div class="bubble"><div class="typing"><i></i><i></i><i></i></div>' +
+      (text ? '<div class="typing-text">' + R.escapeHtml(text) + '</div>' : '') + '</div>';
+    el.chatArea.appendChild(d);
+    scrollBottom();
+    return d;
+  }
+
+  /* ---------------- 清空会话 ---------------- */
+  function clearChat() {
+    if (state.busy) {
+      flashInputError('正在生成回复，请稍候再清空');
+      return;
+    }
+    state.history = [];
+    // 移除所有消息
+    el.chatArea.querySelectorAll('.msg').forEach(function (n) { n.remove(); });
+    // 复位欢迎区并重新渲染建议按钮
+    el.chatArea.innerHTML = WELCOME_HTML;
+    el.welcome = $('welcome');
+    el.suggestGrid = $('suggest-grid');
+    renderSuggestions();
+    el.input.value = '';
+    autoGrow();
+    el.input.focus();
+    el.chatArea.scrollTop = 0;
+  }
+
+  /* 欢迎区 HTML（用于清空后复原） */
+  var WELCOME_HTML =
+    '<div class="welcome" id="welcome">' +
+      '<div class="welcome-icon" aria-hidden="true">KD</div>' +
+      '<h2>川崎病辅助问答</h2>' +
+      '<p class="welcome-sub">基于站内 6 部权威指南与专家共识，回答会标注出处并可跳转原文。</p>' +
+      '<div class="suggest-grid" id="suggest-grid"></div>' +
+      '<div class="welcome-note"><strong>请注意：</strong>本工具不能替代医生诊断。发热 ≥5 天的儿童请及时就医。</div>' +
+    '</div>';
+
+  function bindSuggest() {
+    var grid = $('suggest-grid');
+    if (!grid || grid.dataset.bound) return;
+    grid.dataset.bound = '1';
+    grid.addEventListener('click', function (e) {
+      var btn = e.target.closest('.suggest-btn');
+      if (!btn) return;
+      el.input.value = btn.textContent;
+      autoGrow();
+      send();
+    });
+  }
+
+  /* ---------------- 回答 → 指南章节定位 ---------------- */
+  function jumpToAnchor(anchor, guideId) {
+    if (!anchor) return;
+
+    // 移动端先拉出抽屉
+    var isMobile = window.innerWidth <= 768;
+    if (isMobile) {
+      el.guidePanel.classList.add('open');
+      el.scrim.hidden = false;
+    }
+
+    // 退出搜索态，确保目标条目在 DOM 中
+    if (el.search.value) {
+      el.search.value = '';
+      el.searchClear.hidden = true;
+      renderGuides('');
+    }
+
+    // 展开所属指南
+    var card = document.querySelector('.guide-card[data-guide="' + guideId + '"]');
+    if (card && !card.classList.contains('open')) {
+      state.openGuide = guideId;
+      card.classList.add('open');
+      var hd = card.querySelector('.guide-card-hd');
+      if (hd) hd.setAttribute('aria-expanded', 'true');
+    }
+
+    // 等待渲染后定位
+    setTimeout(function () {
+      var target = document.getElementById('kb-' + anchor);
+      if (!target) {
+        // 条目不在该指南下 → 全局兜底查找
+        target = document.querySelector('[data-anchor="' + anchor + '"]');
+      }
+      if (!target) {
+        console.warn('[KDGUIDE] 未找到锚点', anchor);
+        return;
+      }
+
+      var rect = target.getBoundingClientRect();
+      var top = rect.top + window.pageYOffset - 12;
+
+      if (isMobile) {
+        window.scrollTo({ top: top, behavior: 'smooth' });
+      } else {
+        // 桌面端：右栏固定高度，滚动指南列表内部
+        var list = el.guideList;
+        var lr = list.getBoundingClientRect();
+        var offsetInList = rect.top - lr.top + list.scrollTop - 12;
+        list.scrollTo({ top: Math.max(0, offsetInList), behavior: 'smooth' });
+      }
+
+      // 高亮闪烁层
+      flashRect(target);
+
+      target.classList.add('target');
+      setTimeout(function () { target.classList.remove('target'); }, 3000);
+    }, 240);
+  }
+
+  function flashRect(target) {
+    var f = el.hlFlash;
+    if (!f) return;
+    f.hidden = false;
+    f.style.opacity = '0';
+    var r = target.getBoundingClientRect();
+    f.style.left = (r.left - 5) + 'px';
+    f.style.top = (r.top - 5) + 'px';
+    f.style.width = (r.width + 10) + 'px';
+    f.style.height = (r.height + 10) + 'px';
+    // 强制重排后过渡
+    void f.offsetWidth;
+    f.style.opacity = '1';
+    setTimeout(function () {
+      f.style.opacity = '0';
+      setTimeout(function () { f.hidden = true; }, 380);
+    }, 1300);
+  }
+
+  /* ---------------- Markdown 渲染（极简、安全） ---------------- */
+  /* 只处理 **粗体**、段落、· 列表；先转义再插标签，避免 XSS */
+  function mdInline(text) {
+    var s = R.escapeHtml(text);
+    // 先处理成对的 **粗体**
+    s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    /* 流式渲染时 ** 可能只到了一半，匹配不到成对标记，
+       残留的星号会显示成 "*文本**" 这种残缺样式。
+       故把所有落单星号清除——等后续分片到达会被正确加粗。 */
+    s = s.replace(/\*+/g, '');
+    return s.replace(/\n/g, '<br>');
+  }
+
+  function mdBlock(text) {
+    if (!text) return '<p>（无内容）</p>';
+    var lines = String(text).split('\n');
+    var out = '';
+    var listBuf = [];
+
+    function flushList() {
+      if (listBuf.length) {
+        out += '<ul>' + listBuf.map(function (li) { return '<li>' + mdInline(li) + '</li>'; }).join('') + '</ul>';
+        listBuf = [];
+      }
+    }
+
+    lines.forEach(function (ln) {
+      var t = ln.trim();
+      if (!t) { flushList(); return; }
+      if (/^[·•\-*]\s*/.test(t)) {
+        listBuf.push(t.replace(/^[·•\-*]\s*/, ''));
+      } else if (/^\d+[.、)]\s*/.test(t)) {
+        listBuf.push(t);
+      } else {
+        flushList();
+        out += '<p>' + mdInline(t) + '</p>';
+      }
+    });
+    flushList();
+    return out;
+  }
+
+  function scrollBottom() {
+    setTimeout(function () {
+      el.chatArea.scrollTop = el.chatArea.scrollHeight;
+    }, 40);
+  }
+
+  /* ---------------- 全局错误兜底 ---------------- */
+  window.addEventListener('unhandledrejection', function (e) {
+    console.warn('[KDGUIDE] 未处理的 Promise 异常', e.reason);
+  });
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  /* 暴露少量调试接口（不含密钥） */
+  window.KDApp = {
+    state: state,
+    config: CONFIG,
+    jumpToAnchor: jumpToAnchor
+  };
+
+})();
 </script>
 </body>
 </html>
